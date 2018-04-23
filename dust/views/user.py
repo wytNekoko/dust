@@ -4,13 +4,14 @@ from flask.views import MethodView
 from ..models.user_planet import User, Planet, Suggestion
 from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..core import current_user, db
-from ..exceptions import FormValidationError, exceptions
+from ..exceptions import FormValidationError, NoData
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
 
 class GetDustView(MethodView):
     """get dust from system every day"""
+
     def get(self):
         """TODO: how many times left in a day"""
         return jsonify()
@@ -46,17 +47,20 @@ class BuildPlanetView(MethodView):
 
 
 class SpyView(MethodView):
-    def get(self, planet_name):
-        # planet_name = request.get_json().get('name', '')
+    def get(self, planet_name=None):
         if planet_name:
             p = Planet.query.filter_by(name=planet_name).first()
-            if p:
-                current_user.owned_dust -= 1000
-                owner = User.query.get(p.owner_id)
-                owner.owned_dust += 1000
-                db.session.commit()
-                return jsonify(p.email)
-        return exceptions.NoData
+        else:
+            name = request.get_json().get('planet_name', '')
+            p = Planet.query.filter_by(name=name).first()
+        if p:
+            current_user.owned_dust -= 1000
+            # owner = User.query.get(p.owner_id)
+            # owner.owned_dust += 1000
+            db.session.commit()
+            return jsonify(p.email)
+        else:
+            raise NoData()
 
 
 class SuggestView(MethodView):
@@ -71,4 +75,4 @@ class SuggestView(MethodView):
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
-bp.add_url_rule('/spy', view_func=SpyView.as_view('spy'))
+bp.add_url_rule('/spy/<string:planet_name>', view_func=SpyView.as_view('spy'))

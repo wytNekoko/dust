@@ -62,6 +62,10 @@ class BuildPlanetForm(JSONForm):
         if not self.planet:
             raise ValidationError('No such planet.')
 
+    def validate_dust_num(self, field):
+        if field.data > current_user.owned_dust:
+            raise ValidationError('You donnot have so mach dust.')
+
     # def validate_builder(self):
     #     if self.planet.owner_id == current_user.id:
     #         raise ValidationError('Owner of the planet cannot build it.')

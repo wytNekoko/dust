@@ -5,14 +5,13 @@ current_module = sys.modules[__name__]
 
 exceptions = [
     ('NoError', 0, 'OK'),
-    ('LoginRequired', 1001, '需要登录'),
-    ('LoginInfoRequired', 1002, '用户名密码不能为空'),
-    ('LoginInfoError', 1003, '用户名或密码错误'),
-    ('NoPermission', 1004, '没有权限'),
-    ('NoData', 1005, '数据不存在'),
-    ('SystemRoleCanNotEdit', 1101, '系统角色不可编辑'),
-    ('SystemRoleCanNotDelete', 1102, '系统角色不可删除'),
-    ('RoleHasEmployeesCanNotDelete', 1103, '该角色下还有工作人员'),
+    ('LoginRequired', 1001, 'Login is required.'),
+    ('LoginInfoRequired', 1002, 'username and password cannot be empty.'),
+    ('LoginInfoError', 1003, 'Wrong username or password.'),
+    ('NoPermission', 1004, 'No permission.'),
+    ('NoData', 1005, 'No such record.'),
+    ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
+    ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
 ]
 

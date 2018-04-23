@@ -3,6 +3,7 @@ from flask.views import MethodView
 from sqlalchemy import func
 
 from ..models.user_planet import Planet
+from ..exceptions import NoData
 
 bp = Blueprint('planets', __name__, url_prefix='/planets')
 
@@ -20,4 +21,14 @@ class ShowcaseView(MethodView):
         return jsonify(ret)
 
 
+class GetOnePlanetView(MethodView):
+    def get(self, planet_name):
+        p = Planet.query.filter_by(name=planet_name).first()
+        if p:
+            return p.todict()
+        else:
+            raise NoData()
+
+
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
+bp.add_url_rule('/get-one', view_func=GetOnePlanetView.as_view('one_planet'))

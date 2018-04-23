@@ -1,8 +1,10 @@
 from ..core import db
 from ..models.user_planet import User, Planet, BuildRecord
+from ..models.monthly_focus import TopBuilders, TopOwners, TopPlanets
 from sqlalchemy import desc
 
-REWARD = [10000, 8000, 6000, 3000, 3000, 1000, 1000, 1000, 1000, 1000]
+BONUS = [10000, 8000, 6000, 3000, 3000, 1000, 1000, 1000, 1000, 1000]
+# TODO: juxtaposition problem
 
 
 def distribute(pid, amount):
@@ -21,26 +23,38 @@ def distribute(pid, amount):
 
 
 def liquidate():
-    ret = list()
     plist = Planet.query.order_by(desc(Planet.dust_num)).limit(10)
     print(plist)
-    for i in range(min(plist.count(), 10)):
-        reward = plist[i].dust_num + REWARD[i]
+    for i in range(plist.count()):
+        p = TopPlanets(pid=plist[i].id, pname=plist[i].name, pdust=plist[i].dust_num)
+        db.session.add(p)
+        reward = plist[i].dust_num + BONUS[i]
         owner = User.query.get(plist[i].owner_id)
         owner.owned_dust += reward * 0.4
         distribute(pid=plist[i].id, amount=reward*0.6)
-        ret.append({'name': plist[i].name, 'dust': plist[i].dust_num})
     db.session.commit()
     liquidate_rest_planets(plist)
-    return ret
 
 
 def liquidate_rest_planets(plist):
     planets = Planet.query.all()
     for p in planets:
         if p not in plist:
-            # planet = Planet.query.get(p.id)
             owner = User.query.get(p.owner_id)
             owner.owned_dust += p.dust_num * 0.4
             distribute(pid=p.id, amount=p.dust_num*0.6)
     db.session.commit()
+
+
+def get_monthly_focus():
+    builder_list = User.query.order_by(desc(User.build_reward_dust)).limit(10)
+    for b in builder_list:
+        bb = TopBuilders(bid=b.id, bname=b.username, bdust=b.build_reward_dust)
+        db.session.add(bb)
+
+    owner_list = User.query.order_by(desc(User.planet_dust_sum)).limit(10)
+    for o in owner_list:
+        oo = TopOwners(oid=o.id, oname=o.username, odust=o.planet_dust_sum)
+        db.session.add(oo)
+    db.session.commit()
+
