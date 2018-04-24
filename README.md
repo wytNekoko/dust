@@ -19,7 +19,7 @@ flask shell
 
 #### API
 
- URL                             | Method | POST Json or Description                                     
+ URL                             | Method | POST Json or Return Json                                     
  ------------------------------- | ------ | ------------------------------------------------------------ 
  /login                          | POST   | {'username':'...', 'password': '...'}                        
  /logout                         | POST   |                                                              
@@ -36,7 +36,7 @@ flask shell
  /rank/owners                    | GET    | \[{'name': owner_name, 'planet_dust_sum': num}]
  /profile/owned-planets          | GET    | \[{'name': planet_name, 'dust_num': num}]
  /profile/builded-planets        | GET    | \[{'name': planet_name, 'reward_dust': num}]
- /profile/main                   | GET    | \[{'created_at': timestamp, 'name'; planet_name, 'reward': dust num}]
+ /profile/main                   | GET    | {'total_dust':num, \[{'created_at': timestamp, 'name'; planet_name, 'reward': dust num}]
 
 
 
