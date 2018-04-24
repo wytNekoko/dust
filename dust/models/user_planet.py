@@ -67,6 +67,7 @@ class Planet(db.Model, TimestampMixin):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     dust_num = db.Column(db.Integer, nullable=False, default=0)
     email = db.Column(db.String(191), nullable=False, default='')
+    reward = db.Column(db.Integer, nullable=False, default=0, comment='Reward for the owner after liquidation')
 
 
 class BuildRecord(db.Model, TimestampMixin):
@@ -75,6 +76,7 @@ class BuildRecord(db.Model, TimestampMixin):
     planet_id = db.Column(db.Integer, nullable=False, default=0)
     dust_num = db.Column(db.Integer, nullable=False, default=0, comment='Dust for single build')
     planet_dust = db.Column(db.Integer, nullable=False, default=0, comment='Current dust sum of the planet')
+    reward = db.Column(db.Integer, nullable=False, default=0, comment='Reward after liquidation')
 
 
 class Suggestion(db.Model, TimestampMixin):

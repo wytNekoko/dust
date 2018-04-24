@@ -20,6 +20,7 @@ def distribute(pid, amount):
         income = amount * record.dust_num * factor / denominator
         builder.owned_dust += income
         builder.build_reward_dust += income
+        record.reward = income
 
 
 def liquidate():
@@ -30,7 +31,9 @@ def liquidate():
         db.session.add(p)
         reward = plist[i].dust_num + BONUS[i]
         owner = User.query.get(plist[i].owner_id)
-        owner.owned_dust += reward * 0.4
+        portion = reward * 0.4
+        owner.owned_dust += portion
+        plist[i].reward += portion
         distribute(pid=plist[i].id, amount=reward*0.6)
     db.session.commit()
     liquidate_rest_planets(plist)
