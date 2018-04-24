@@ -12,12 +12,14 @@ class ShowcaseView(MethodView):
     def get(self):
         plist = Planet.query.order_by(func.rand()).limit(16)
         ret = list()
-        for i in range(16):
+        for i in range(plist.count()):
             ret.append({'name': plist[i].name,
                         'description': plist[i].description,
                         'demo': plist[i].demo_url,
                         'git': plist[i].github_url,
-                        'team': plist[i].team_intro})
+                        'team': plist[i].team_intro,
+                        'create_at': plist[i].create_at
+                        })
         return jsonify(ret)
 
 

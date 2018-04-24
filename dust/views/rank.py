@@ -1,9 +1,7 @@
 from flask import Blueprint, jsonify
 from flask.views import MethodView
-from sqlalchemy import desc
 
 from ..models.monthly_focus import TopOwners, TopBuilders, TopPlanets
-from ..logics.liquidation import liquidate
 
 bp = Blueprint('rank', __name__, url_prefix='/rank')
 
