@@ -11,7 +11,7 @@ bp = Blueprint('profile', __name__, url_prefix='/profile')
 class OwnedPlanets(MethodView):
     def get(self):
         ps = current_user.owned_planets
-        return jsonify([{'name': p.name, 'dust_num': p.dust_num-500} for p in ps])
+        return jsonify([{'name': p.name, 'dust_num': p.dust_num} for p in ps])
 
 
 class BuildedPlanets(MethodView):
