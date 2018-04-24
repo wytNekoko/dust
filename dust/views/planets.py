@@ -18,7 +18,7 @@ class ShowcaseView(MethodView):
                         'demo': plist[i].demo_url,
                         'git': plist[i].github_url,
                         'team': plist[i].team_intro,
-                        'create_at': plist[i].create_at
+                        'created_at': plist[i].created_at
                         })
         return jsonify(ret)
 
@@ -33,4 +33,4 @@ class GetOnePlanetView(MethodView):
 
 
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
-bp.add_url_rule('/get-one', view_func=GetOnePlanetView.as_view('one_planet'))
+bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view('one_planet'))
