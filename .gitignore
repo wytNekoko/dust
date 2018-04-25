@@ -3,6 +3,7 @@ venv/
 .idea/
 *iml
 *xml
+__pycache__/
 
 # test
 test*
