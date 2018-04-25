@@ -15,7 +15,7 @@ class RegisterView(MethodView):
             user = form.save()
             return user.todict()
         else:
-            raise FormValidationError
+            raise FormValidationError(form)
 
 
 bp.add_url_rule('/register', view_func=RegisterView.as_view('user_register'))
