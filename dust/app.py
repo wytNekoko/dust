@@ -32,7 +32,7 @@ def before_request(app):
         logger.debug('### before request - blueprint: %s, endpoint: %s, method: %s, view_args: %s',
                      request.blueprint, request.endpoint, request.method, request.view_args)
         # 忽略不需要登录的blueprint
-        if request.blueprint in {'login', 'register', 'rank'}:
+        if request.blueprint in {'login', 'register', 'rank', 'planets'}:
             return
         # 内部使用的API鉴权
         if request.blueprint in {'permission_api'}:
