@@ -32,7 +32,7 @@ class LoginView(MethodView):
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200)
         redis_store.expire(auth_token, expires_in)
 
-        return dict(auth_token=auth_token, expires_in=expires_in, id=user.id)
+        return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())
 
 
 class LogoutView(MethodView):
