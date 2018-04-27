@@ -29,7 +29,7 @@ class LoginView(MethodView):
             password=user.password,
             created_at=datetime.now()
         ))
-        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200)
+        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200)  # TODO: expire in 2 days
         redis_store.expire(auth_token, expires_in)
 
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())

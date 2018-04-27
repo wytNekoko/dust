@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, time
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
@@ -9,18 +9,34 @@ from ..exceptions import FormValidationError, NoData
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
+time_end = [0, 8, 16, 24]
+
 
 class GetDustView(MethodView):
     """get dust from system every day"""
-
-    def get(self):
-        """TODO: how many times left in a day"""
-        return jsonify()
-
     def post(self):
-        current_user.owned_dust += 88
-        db.session.commit()
-        return jsonify(current_user.owned_dust)
+        now = datetime.now()
+        for i in range(3):
+            if time_end[i] <= now.hour < time_end[i+1]:
+                t = redis_store.hgetall(current_user.id)
+                if not t:
+                    redis_store.hmset(current_user.id, dict(tag=i))
+                    current_user.owned_dust += 88
+                    db.session.commit()
+                    return jsonify(current_user.owned_dust)
+                elif not int(t.get('tag')) == i:
+                    redis_store.hmset(current_user.id, t)
+                    current_user.owned_dust += 88
+                    db.session.commit()
+                    return jsonify(current_user.owned_dust)
+                else:
+                    delta = str(time_end[i+1] - now.hour)
+                    if delta == '1':
+                        return jsonify('You can get it in %s hour' % delta)
+                    elif delta == '0':
+                        return jsonify('You can get it in 8 hours')
+                    else:
+                        return jsonify('You can get it in %s hours' % delta)
 
 
 class SetupPlanetView(MethodView):
