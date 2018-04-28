@@ -4,13 +4,14 @@ from sqlalchemy import func
 
 from ..models.user_planet import Planet
 from ..exceptions import NoData
+from ..constants import Status
 
 bp = Blueprint('planets', __name__, url_prefix='/planets')
 
 
 class ShowcaseView(MethodView):
     def get(self):
-        plist = Planet.query.order_by(func.rand()).limit(16)
+        plist = Planet.query.filter_by(status=Status.DEFAULT).order_by(func.rand()).limit(16)
         ret = list()
         for i in range(plist.count()):
             ret.append({'name': plist[i].name,

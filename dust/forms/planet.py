@@ -5,6 +5,7 @@ from wtforms.validators import DataRequired, Length, Email, ValidationError, Num
 from . import JSONForm
 from ..core import current_user, db
 from ..models.user_planet import Planet, User, BuildRecord
+from ..constants import Status
 
 
 class SetupPlanetForm(JSONForm):
@@ -72,6 +73,8 @@ class BuildPlanetForm(JSONForm):
 
     def validate_time(self):
         if datetime.now() - self.planet.created_at > timedelta(days=30):
+            self.planet.status = Status.UNSHELVED
+            db.session.commit()
             raise ValidationError('Build timeout.')
 
     def build(self):

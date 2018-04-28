@@ -4,6 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..core import db
 from . import TimestampMixin
+from ..constants import Status
 
 
 team_user_table = db.Table(
@@ -30,7 +31,7 @@ class User(db.Model, TimestampMixin):
     owned_dust = db.Column(db.Integer, nullable=False, default=5000, comment='<=20 character')
     is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor')
     is_captain = db.Column(db.Boolean, nullable=False, default=True)
-
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
     build_reward_dust = db.Column(db.Integer, nullable=False, default=0)
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
 
@@ -68,6 +69,7 @@ class Planet(db.Model, TimestampMixin):
     dust_num = db.Column(db.Integer, nullable=False, default=0)
     email = db.Column(db.String(191), nullable=False, default='')
     reward = db.Column(db.Integer, nullable=False, default=0, comment='Reward for the owner after liquidation')
+    status = db.Column(db.Integer, nullable=False, default=Status.DEFAULT, comment='Normal or unshelved.')
 
 
 class BuildRecord(db.Model, TimestampMixin):
