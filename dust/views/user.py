@@ -16,27 +16,31 @@ class GetDustView(MethodView):
     """get dust from system every day"""
     def post(self):
         now = datetime.now()
+        expire = 3600*8
         for i in range(3):
             if time_end[i] <= now.hour < time_end[i+1]:
                 t = redis_store.hgetall(current_user.id)
                 if not t:
                     redis_store.hmset(current_user.id, dict(tag=i))
+                    redis_store.expire(current_user.id, expire)
                     current_user.owned_dust += 88
                     db.session.commit()
                     return jsonify(current_user.owned_dust)
                 elif not int(t.get('tag')) == i:
-                    redis_store.hmset(current_user.id, t)
+                    redis_store.delete(current_user.id)
+                    redis_store.hmset(current_user.id, dict(tag=i))
+                    redis_store.expire(current_user.id, expire)
                     current_user.owned_dust += 88
                     db.session.commit()
                     return jsonify(current_user.owned_dust)
                 else:
-                    delta = str(time_end[i+1] - now.hour)
-                    if delta == '1':
-                        return jsonify('You can get it in %s hour' % delta)
-                    elif delta == '0':
-                        return jsonify('You can get it in 8 hours')
+                    delta = time_end[i+1] - now.hour
+                    if delta == 1:
+                        return jsonify('You can get it again in 1 hour')
+                    elif delta == 0:
+                        return jsonify('You can get it again in 8 hours')
                     else:
-                        return jsonify('You can get it in %s hours' % delta)
+                        return jsonify('You can get it again in %d hours' % delta)
 
 
 class SetupPlanetView(MethodView):
