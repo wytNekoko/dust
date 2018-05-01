@@ -1,6 +1,6 @@
 class Config(object):
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@127.0.0.1/dora_dust'
-    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@127.0.0.1/dust'
+    # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@127.0.0.1/dora_dust'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@127.0.0.1/dust'
     SQLALCHEMY_ECHO = True
     REDIS_URL = "redis://localhost:6379/0"
     LOGIN_EXPIRE_TIME = 7200

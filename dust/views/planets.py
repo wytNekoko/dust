@@ -33,5 +33,20 @@ class GetOnePlanetView(MethodView):
             raise NoData()
 
 
+class AllPlanetsView(MethodView):
+    def get(self):
+        planets = Planet.query.filter_by(status=Status.DEFAULT)  # can't be .all(), which returns a list
+        ps = planets.paginate()
+        records = [p.todict() for p in ps.items]
+        return jsonify(
+            records=records,
+            total=ps.total,
+            page=ps.page,
+            per_page=ps.per_page,
+            pages=ps.pages
+        )
+
+
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
 bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view('one_planet'))
+bp.add_url_rule('/all', view_func=AllPlanetsView.as_view('all_planets'))
