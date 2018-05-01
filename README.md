@@ -23,11 +23,8 @@ flask shell
  ------------------------------- | ------ | ------------------------------------------------------------ 
  /login                          | POST   | {'username':'...', 'password': '...'}                        
  /logout                         | POST   |                                                              
- /register                       | POST   | {'username':'...', 'password': '...'}                        
- /planets/show                   | GET    | Get random 16 planets' info, in which timestamp is 'created_at'
- /planets/one/\<string:planet_name>  | GET    | Return the planet's info                                     
- /user/planet                    | POST   | Set up a planet                                              
- /user/get-dust                  | GET    | How many times left in a day to get dust                     
+ /register                       | POST   | {'username':'...', 'password': '...'}  
+ /user/planet                    | POST   | Set up a planet                                                                 
  /user/get-dust                  | POST   | Get 88 dust                                                  
  /user/build                     | POST   | {'planet_name':'…', 'dust_num':'...'}                        
  /user/spy/\<string:planet_name> | GET    | xxx@yyy.com                                                 
@@ -36,6 +33,9 @@ flask shell
  /profile/owned-planets          | GET    | \[{'name': planet_name, 'dust_num': num}]
  /profile/builded-planets        | GET    | \[{'name': planet_name, 'reward_dust': num}]
  /profile/main                   | GET    | {'total_dust':num, \[{'created_at': timestamp, 'name'; planet_name, 'reward': dust num}]
+ /planets/show                   | GET    | Get random 16 planets' info, in which timestamp is 'created_at'
+ /planets/one/\<string:planet_name>  | GET    | Return the planet's info
+ /planets/all                    | GET    | {'records':\[{<planet_info>}], 'total': <total_records_num>, 'page':<page_index>, 'per_page':<records_num_per_page>, 'pages':<pages_num>}
 
 
 
