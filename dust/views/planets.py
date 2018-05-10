@@ -37,7 +37,12 @@ class AllPlanetsView(MethodView):
     def get(self):
         planets = Planet.query.filter_by(status=Status.DEFAULT)  # can't be .all(), which returns a list
         ps = planets.paginate()
-        records = [p.todict() for p in ps.items]
+        records = list()
+        for p in ps.items:
+            tmp = p.todict()
+            tmp['created_at'] = p.created_at
+            records.append(tmp)
+        #records = [p.todict() for p in ps.items]
         return jsonify(
             records=records,
             total=ps.total,
