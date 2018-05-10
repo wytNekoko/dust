@@ -28,7 +28,9 @@ class GetOnePlanetView(MethodView):
     def get(self, planet_name):
         p = Planet.query.filter_by(name=planet_name).first()
         if p:
-            return p.todict()
+            x = p.todict()
+            x['created_at'] = p.created_at
+            return x
         else:
             raise NoData()
 
