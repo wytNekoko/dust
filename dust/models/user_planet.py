@@ -38,6 +38,7 @@ class User(db.Model, TimestampMixin):
     # one-to-many
     owned_planets = db.relationship('Planet')
     suggestions = db.relationship('Suggestion')
+    bounty_rewards = db.relationship('BountyReward')
     # many-to-many
     teams = db.relationship('Team', secondary=team_user_table)
 
@@ -86,3 +87,15 @@ class Suggestion(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.TEXT, nullable=False, default='')
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class BountyReward(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
+                   comment='auto-generated random 7-digit-number')
+    name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
+    description = db.Column(db.TEXT, nullable=False, default='')
+    keywords = db.Column(db.String(100), nullable=False, default='')
+    email = db.Column(db.String(191), nullable=False, default='')
+    status = db.Column(db.SmallInteger, nullable=False, default=Status.DEFAULT)
+    reward = db.Column(db.Integer, nullable=False, default=0)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))

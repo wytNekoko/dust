@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from flask.views import MethodView
 from sqlalchemy import desc
-from ..models.user_planet import Planet, User
+from ..models.user_planet import Planet, User, BountyReward
 from ..models.monthly_focus import TopOwners, TopBuilders, TopPlanets
 
 bp = Blueprint('rank', __name__, url_prefix='/rank')
@@ -31,5 +31,15 @@ class WinnerView(MethodView):
         return jsonify(ret)
 
 
+class BountyView(MethodView):
+    def get(self):
+        ret = dict()
+        rs = BountyReward.query.order_by(BountyReward.reward.desc()).limit(10)
+        ret['rewards'] = [{'name': r.name, 'dust': r.reward} for r in rs]
+        ret['hunters'] = []
+        return jsonify(ret)
+
+
 bp.add_url_rule('/dashboard', view_func=DashboardView.as_view('rank_dashboard'))
 bp.add_url_rule('/winners', view_func=WinnerView.as_view('rank_winners'))
+bp.add_url_rule('/bounty', view_func=BountyView.as_view('rank_bounty'))
