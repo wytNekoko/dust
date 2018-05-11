@@ -70,6 +70,7 @@ class Planet(db.Model, TimestampMixin):
     email = db.Column(db.String(191), nullable=False, default='')
     reward = db.Column(db.Integer, nullable=False, default=0, comment='Reward for the owner after liquidation')
     status = db.Column(db.Integer, nullable=False, default=Status.DEFAULT, comment='Normal or unshelved.')
+    builder_num = db.Column(db.Integer, nullable=False, default=0, comment='builders')
 
 
 class BuildRecord(db.Model, TimestampMixin):

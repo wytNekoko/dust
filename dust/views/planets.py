@@ -54,6 +54,20 @@ class AllPlanetsView(MethodView):
         )
 
 
+class RankListView(MethodView):
+    def get(self):
+        planets = Planet.query.filter_by(status=Status.DEFAULT).order_by(Planet.dust_num.desc())
+        # ret = [p.todict() for p in planets]
+        ret = list()
+        for index, value in enumerate(planets):
+            x = planets[index].todict()
+            x['rank'] = index + 1
+            ret.append(x)
+        return jsonify(ret)
+
+
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
 bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view('one_planet'))
 bp.add_url_rule('/all', view_func=AllPlanetsView.as_view('all_planets'))
+bp.add_url_rule('/ranklist', view_func=RankListView.as_view('rank_list'))
+

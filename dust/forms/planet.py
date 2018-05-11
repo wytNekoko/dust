@@ -83,6 +83,7 @@ class BuildPlanetForm(JSONForm):
         record.planet_id = self.planet.id
         record.dust_num = self.dust_num.data
         self.planet.dust_num += self.dust_num.data
+        self.planet.builder_num += 1
         planet_owner = User.query.get(self.planet.owner_id)
         planet_owner.planet_dust_sum += self.dust_num.data
         current_user.owned_dust -= self.dust_num.data
