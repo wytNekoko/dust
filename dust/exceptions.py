@@ -13,6 +13,7 @@ exceptions = [
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
+    ('NoDust', 1006, 'Not enough dusts you owned')
 ]
 
 
