@@ -25,6 +25,11 @@ class SetupPlanetForm(JSONForm):
         if e:
             raise ValidationError('Duplicate planet name')
 
+    def validate_github_url(self, field):
+        e = Planet.query.filter_by(github_url=field.data).first()
+        if e:
+            raise ValidationError('This project already exits as a planet.')
+
     def save(self, pid=None):
         if pid:
             p = Planet.query.get_or_404(pid)
