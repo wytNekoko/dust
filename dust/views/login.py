@@ -44,14 +44,8 @@ class LogoutView(MethodView):
 
 
 class AuthGithub(MethodView):
-    def get(self):
-        logger.debug('request: ', request)
-        logger.debug('json: ', request.get_json())
-        logger.debug('data: ', request.get_data())
-        return jsonify()
-
     def post(self):
-        logger.debug('request: ', request)
+        content = request.get_json(force=True)
         logger.debug('json: ', request.get_json())
         logger.debug('data: ', request.get_data())
         return jsonify()
