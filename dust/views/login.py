@@ -2,10 +2,10 @@ import binascii
 import os
 from datetime import datetime
 
-from flask import Blueprint, current_app, request
+from flask import Blueprint, current_app, request, jsonify
 from flask.views import MethodView
 
-from ..core import redis_store
+from ..core import redis_store, logger
 from ..exceptions import LoginInfoError, LoginInfoRequired, NoError
 from ..models.user_planet import User
 
@@ -43,5 +43,14 @@ class LogoutView(MethodView):
         raise NoError
 
 
+class AuthGithub(MethodView):
+    def post(self):
+        logger.debug('request: ', request)
+        logger.debug('json: ', request.get_json())
+        logger.debug('data: ', request.get_data())
+        return jsonify()
+
+
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
+bp.add_url_rule('/auth/github', view_func=AuthGithub.as_view('auth_github'))
