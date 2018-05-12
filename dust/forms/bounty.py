@@ -13,6 +13,7 @@ class SetupBountyRewardForm(JSONForm):
     description = StringField('description', [DataRequired(), Length(min=1)])
     keywords = StringField('team')
     email = StringField('email', [Email()])
+    reward = IntegerField('reward')
 
     def __init__(self, uid=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,6 +35,7 @@ class SetupBountyRewardForm(JSONForm):
         p.description = self.description.data
         p.keywords = self.keywords.data
         p.email = self.email.data
+        p.reward = self.reward.data
         db.session.commit()
         return p
 

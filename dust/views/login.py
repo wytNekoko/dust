@@ -45,10 +45,7 @@ class LogoutView(MethodView):
 
 class AuthGithub(MethodView):
     def post(self):
-        content = request.get_json(force=True)
-        logger.debug('json: ', request.get_json())
-        logger.debug('data: ', request.get_data())
-        return jsonify()
+        return jsonify(request.get_data())
 
 
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
