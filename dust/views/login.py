@@ -1,7 +1,7 @@
 import binascii
 import os
 from datetime import datetime
-
+import ast
 from flask import Blueprint, current_app, request, jsonify
 from flask.views import MethodView
 
@@ -46,7 +46,9 @@ class LogoutView(MethodView):
 class AuthGithub(MethodView):
     def post(self):
         content = request.get_data()
-        code = content.decode("utf-8")
+        y = content.decode("utf-8")
+        x = ast.literal_eval(y)
+        code = x['code']
         return jsonify(code)
 
 
