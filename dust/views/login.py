@@ -1,8 +1,7 @@
 import binascii
 import os
 from datetime import datetime
-import ast
-from flask import Blueprint, current_app, request, jsonify
+from flask import Blueprint, current_app, request
 from flask.views import MethodView
 
 from ..core import redis_store,  db
