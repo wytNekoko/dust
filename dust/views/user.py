@@ -2,10 +2,11 @@ from datetime import datetime, time
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
-from ..models.user_planet import User, Planet, Suggestion
+from ..models.user_planet import User, Planet, Notification
 from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..core import current_user, db, redis_store
 from ..exceptions import FormValidationError, NoData, NoDust
+from ..constants import Notify, NotifyContent
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -78,25 +79,16 @@ class SpyView(MethodView):
             if current_user.owned_dust <= 1000:
                 raise NoDust()
             current_user.owned_dust -= 1000
-            # owner = User.query.get(p.owner_id)
-            # owner.owned_dust += 1000
+            n = Notification(type=Notify.SPY, uid=current_user.id)
+            n.content = NotifyContent.get(Notify.SPY).format(p.name, p.email)
+            db.session.add(n)
             db.session.commit()
             return jsonify(p.email)
         else:
             raise NoData()
 
 
-class SuggestView(MethodView):
-    def post(self):
-        content = request.get_json().get('content', '')
-        new_sug = Suggestion(uid=current_user.id, content=content)
-        db.session.add(new_sug)
-        db.session.commit()
-        return jsonify()
-
-
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
 bp.add_url_rule('/spy/<string:planet_name>', view_func=SpyView.as_view('spy'))
-bp.add_url_rule('/suggest', view_func=SuggestView.as_view('suggest'))

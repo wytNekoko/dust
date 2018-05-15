@@ -32,6 +32,9 @@ class User(db.Model, TimestampMixin):
     is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor')
     is_captain = db.Column(db.Boolean, nullable=False, default=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    git_account = db.Column(db.String(191), nullable=False, default='')
+    fb_account = db.Column(db.String(191), nullable=False, default='')
+    github_link = db.Column(db.String(191), nullable=False, default='')
     build_reward_dust = db.Column(db.Integer, nullable=False, default=0)
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
 
@@ -86,16 +89,28 @@ class BuildRecord(db.Model, TimestampMixin):
 class Suggestion(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.TEXT, nullable=False, default='')
+    email = db.Column(db.String(191), nullable=False, default='')
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    title = db.Column(db.String(50))
+    type = db.Column(db.String(20))
 
 
 class BountyReward(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
                    comment='auto-generated random 7-digit-number')
     name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
+    company_name = db.Column(db.String(20), nullable=False, default='')
     description = db.Column(db.TEXT, nullable=False, default='')
     keywords = db.Column(db.String(100), nullable=False, default='')
+    background = db.Column(db.TEXT, nullable=False, default='')
     email = db.Column(db.String(191), nullable=False, default='')
     status = db.Column(db.SmallInteger, nullable=False, default=Status.DEFAULT)
     reward = db.Column(db.Integer, nullable=False, default=0)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class Notification(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(200), nullable=False, default='')
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    type = db.Column(db.SmallInteger, nullable=False)

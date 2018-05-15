@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from wtforms import StringField, Field, IntegerField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, NumberRange, URL
-
+from flask import request
 from . import JSONForm
-from ..core import current_user, db
+from ..core import current_user, db, redis_store
 from ..models.user_planet import Planet, User, BuildRecord
 from ..constants import Status
 
@@ -82,6 +82,11 @@ class BuildPlanetForm(JSONForm):
             db.session.commit()
             raise ValidationError('Build timeout.')
 
+    def validate_build_times(self):
+        t = redis_store.get("%s:build_times" % current_user.id)
+        if t <= 0:
+            raise ValidationError('Today\'s three times have been used. Please build tomorrow.')
+
     def build(self):
         record = BuildRecord(builder_id=current_user.id)
         db.session.add(record)
@@ -95,4 +100,7 @@ class BuildPlanetForm(JSONForm):
         db.session.flush()
         record.planet_dust = self.planet.dust_num
         db.session.commit()
+        t = redis_store.get("%s:build_times" % current_user.id)
+        tleft = redis_store.ttl("%s:build_times" % current_user.id)
+        redis_store.set("%s:build_times" % current_user.id, t-1, ex=tleft)
         return record

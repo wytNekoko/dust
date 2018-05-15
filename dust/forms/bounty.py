@@ -1,17 +1,17 @@
-from datetime import datetime, timedelta
 from wtforms import StringField, Field, IntegerField
-from wtforms.validators import DataRequired, Length, Email, ValidationError, NumberRange, URL
+from wtforms.validators import DataRequired, Length, Email, ValidationError
 
 from . import JSONForm
 from ..core import current_user, db
 from ..models.user_planet import BountyReward, User
-from ..constants import Status
 
 
 class SetupBountyRewardForm(JSONForm):
     name = Field('name', [DataRequired(), Length(max=20, min=1)])
+    company_name = StringField()
     description = StringField('description', [DataRequired(), Length(min=1)])
     keywords = StringField('team')
+    background = StringField()
     email = StringField('email', [Email()])
     reward = IntegerField('reward')
 
@@ -30,10 +30,11 @@ class SetupBountyRewardForm(JSONForm):
         else:
             p = BountyReward(owner_id=self.uid)
             db.session.add(p)
-            p.dust_num = 500
         p.name = self.name.data
+        p.company_name = self.company_name.data
         p.description = self.description.data
         p.keywords = self.keywords.data
+        p.background = self.background.data
         p.email = self.email.data
         p.reward = self.reward.data
         db.session.commit()
@@ -44,6 +45,6 @@ class SetupBountyRewardForm(JSONForm):
             owner = User.query.get_or_404(owner_id)
         else:
             owner = current_user
-        owner.owned_dust += 500
+        # owner.owned_dust += 500
         return self.save()
 

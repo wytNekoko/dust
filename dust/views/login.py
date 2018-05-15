@@ -5,9 +5,10 @@ import ast
 from flask import Blueprint, current_app, request, jsonify
 from flask.views import MethodView
 
-from ..core import redis_store, logger
+from ..core import redis_store,  db
 from ..exceptions import LoginInfoError, LoginInfoRequired, NoError
-from ..models.user_planet import User
+from ..models.user_planet import User, Notification
+from ..constants import Notify, NotifyContent
 
 bp = Blueprint('login', __name__)
 
@@ -27,10 +28,15 @@ class LoginView(MethodView):
         redis_store.hmset(auth_token, dict(
             id=user.id,
             password=user.password,
-            created_at=datetime.now()
+            created_at=datetime.now(),
         ))
-        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*24)  # expire in 2 days
+        n = Notification(type=Notify.BUILD, uid=user.id)
+        db.session.add(n)
+        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
+        redis_store.set("%s:build_times" % user.id, 3, ex=expires_in)
+        n.content = NotifyContent.get(Notify.BUILD).format('3')
+        db.session.commit()
 
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())
 
@@ -43,15 +49,5 @@ class LogoutView(MethodView):
         raise NoError
 
 
-class AuthGithub(MethodView):
-    def post(self):
-        content = request.get_data()
-        y = content.decode("utf-8")
-        x = ast.literal_eval(y)
-        code = x['code']
-        return jsonify(code)
-
-
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
-bp.add_url_rule('/auth/github', view_func=AuthGithub.as_view('auth_github'))

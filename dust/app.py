@@ -2,7 +2,7 @@ import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
 
-from .core import db, logger, redis_store #, oss
+from .core import db, logger, redis_store, oauth_client #, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
@@ -17,6 +17,7 @@ def create_app(config=None):
     db.init_app(app)
     Migrate(app, db)
     redis_store.init_app(app)
+    oauth_client.init_app(app)
     # oss.init_app(app)
 
     before_request(app)

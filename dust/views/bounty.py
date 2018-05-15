@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify
 from flask.views import MethodView
-from sqlalchemy import func
 
 from ..forms.bounty import *
 from ..models.user_planet import BountyReward
