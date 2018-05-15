@@ -1,6 +1,9 @@
 import requests, json
 from ..config import DevConfig as cfg
-from . import logger
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 class OAUTHException(Exception):
     # -1 conn err, -2 conn/status err -3 json err, -4 login, -5 resp.code err
