@@ -4,6 +4,7 @@ from flask.views import MethodView
 
 from ..models.user_planet import User, Planet, Notification
 from ..forms.planet import BuildPlanetForm, SetupPlanetForm
+from ..forms.bounty import *
 from ..core import current_user, db, redis_store
 from ..exceptions import FormValidationError, NoData, NoDust
 from ..constants import Notify, NotifyContent
@@ -45,10 +46,6 @@ class GetDustView(MethodView):
 
 
 class SetupPlanetView(MethodView):
-    # def get(self):
-    #     planets = Planet.query.all()
-    #     return jsonify(planets)
-
     def post(self):
         form = SetupPlanetForm()
         if form.validate():
@@ -88,7 +85,18 @@ class SpyView(MethodView):
             raise NoData()
 
 
+class SetupBountyView(MethodView):
+    def post(self):
+        form = SetupBountyRewardForm()
+        if form.validate():
+            p = form.setup()
+            return p.todict()
+        else:
+            raise FormValidationError(form)
+
+
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
 bp.add_url_rule('/spy/<string:planet_name>', view_func=SpyView.as_view('spy'))
+bp.add_url_rule('/bounty', view_func=SetupBountyView.as_view('setup_bounty'))
