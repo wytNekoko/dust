@@ -86,12 +86,12 @@ class OAuthApi:
 
     def get_token(self, code):
         path = 'github.com/login/oauth/access_token'
-        session = requests.Session()
-        json_data = dict(code=code, client_id=cfg['GH_CLIENT_ID'], client_secret=cfg['GH_CLIENT_SECRET'])
-        header = {'Accept': 'application/json'}
-        return self.req(path, json_data, method='POST', headers=header, session=session)
+        # session = requests.Session()
+        data = dict(code=code, client_id=cfg['GH_CLIENT_ID'], client_secret=cfg['GH_CLIENT_SECRET'])
+        header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+        return self.req(path, json_data=data, method='POST', headers=header)# , session=session)
 
     def api(self):
-        basePath = 'https://api.github.com/user?access_token='
+        basePath = 'api.github.com/user?access_token='
         path = basePath + self.token
-        return self.req(path, method='GET')
+        return self.req(path, method='GET', headers={'Accept': 'application/json'})

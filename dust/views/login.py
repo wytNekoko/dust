@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, current_app, request
 from flask.views import MethodView
 
-from ..core import redis_store,  db
+from ..core import redis_store,  db, oauth_client
 from ..exceptions import LoginInfoError, LoginInfoRequired, NoError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
@@ -51,5 +51,33 @@ class LogoutView(MethodView):
         raise NoError
 
 
+class LoginAuthGithub(MethodView):
+    def post(self):
+        code = request.get_json().get('code')
+        resp = oauth_client.get_token(code)
+        access_token = resp.json.get('access_token')
+        oauth_client.set_token(access_token)
+        user_info = oauth_client.api().json
+        user = User.get_by_username(user_info.login)
+        auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
+        redis_store.hmset(auth_token, dict(
+            id=user.id,
+            created_at=datetime.now(),
+        ))
+        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
+        redis_store.expire(auth_token, expires_in)
+
+        s = redis_store.get("%s:build_times" % user.id)
+        if not s:
+            n = Notification(type=Notify.BUILD, uid=user.id)
+            db.session.add(n)
+            redis_store.set("%s:build_times" % user.id, 3, ex=expires_in)
+            n.content = NotifyContent.get(Notify.BUILD).format('3')
+        db.session.commit()
+
+        return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())
+
+
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
+bp.add_url_rule('/login/github', view_func=LoginView.as_view('login_github'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))

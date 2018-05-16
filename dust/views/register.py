@@ -23,19 +23,6 @@ class RegisterView(MethodView):
             raise FormValidationError(form)
 
 
-class AuthGithub(MethodView):
-    def get(self):
-        content = request.get_data()
-        logger.debug('### auth request', request)
-        logger.debug('### auth get_data', content)
-        logger.debug('### auth get_json', request.get_json())
-        # y = content.decode("utf-8")
-        # x = ast.literal_eval(y)
-        # code = x['code']
-        # return {'code': code}
-        return request
-
-
 class RegisterAuthGithub(MethodView):
     def post(self):
         code = request.get_json().get('code')
@@ -45,7 +32,7 @@ class RegisterAuthGithub(MethodView):
         logger.debug('### oauth_client resp.json', resp.json)
         access_token = resp.json.get('access_token')
         oauth_client.set_token(access_token)
-        user_info = oauth_client.api()
+        user_info = oauth_client.api().json
         logger.debug('### github user', user_info)
         u = User(username=user_info.get('login'))
         u.git_account = user_info.get('email')
@@ -68,5 +55,4 @@ class RegisterAuthGithub(MethodView):
 
 
 bp.add_url_rule('/register', view_func=RegisterView.as_view('user_register'))
-bp.add_url_rule('/auth/github', view_func=AuthGithub.as_view('auth_github'))
 bp.add_url_rule('/register/github', view_func=RegisterAuthGithub.as_view('register_github'))
