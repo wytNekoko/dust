@@ -11,8 +11,8 @@ bp = Blueprint('bounty', __name__, url_prefix='/bounty')
 
 class GetBountyView(MethodView):
     def get(self):
-        s = BountyReward.query.all()
-        return jsonify(s)
+        ss = BountyReward.query.all()
+        return jsonify([s.todict() for s in ss])
 
 
 bp.add_url_rule('/show', view_func=GetBountyView.as_view('show_bounty'))
