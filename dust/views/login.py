@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 
 from ..core import redis_store,  db, oauth_client
-from ..exceptions import LoginInfoError, LoginInfoRequired, NoError
+from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -55,10 +55,12 @@ class LoginAuthGithub(MethodView):
     def post(self):
         code = request.get_json().get('code')
         resp = oauth_client.get_token(code)
-        access_token = resp.json.get('access_token')
+        access_token = resp.json().get('access_token')
+        if not access_token:
+            raise LoginAuthError()
         oauth_client.set_token(access_token)
-        user_info = oauth_client.api().json
-        user = User.get_by_username(user_info.login)
+        user_info = oauth_client.api().json()
+        user = User.get_by_username(user_info.get('login'))
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             id=user.id,
@@ -79,5 +81,5 @@ class LoginAuthGithub(MethodView):
 
 
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
-bp.add_url_rule('/login/github', view_func=LoginView.as_view('login_github'))
+bp.add_url_rule('/auth-login/github', view_func=LoginAuthGithub.as_view('login_github'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))

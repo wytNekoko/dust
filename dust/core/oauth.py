@@ -1,5 +1,5 @@
 import requests, json
-from ..config import DevConfig as cfg
+from ..config import DevConfig
 import logging
 
 
@@ -48,6 +48,7 @@ class OAuthApi:
         session = session if session else self.session
         try:
             resp = session.request(method, url, json=json_data, data=data, files=files, headers=headers, timeout=30)
+            logger.debug('resp:', resp)
         except (requests.ConnectTimeout, requests.ReadTimeout) as e:
             raise OAUTHException(code=-1,
                                     msg='req timeout, path: {}, err:{}'.format(path, e),
@@ -57,28 +58,7 @@ class OAuthApi:
             raise OAUTHException(code=-2,
                                     msg='resp conn err, path:{}'.format(path),
                                     errmsg=self.OAUTH_ERR_MSG)
-
-        if resp.status_code != 200:
-            raise OAUTHException(code=-2,
-                                    msg='resp status code err, path:{}:{}'.format(path, resp.status_code),
-                                    errmsg=self.OAUTH_ERR_MSG)
-        try:
-            data = resp.json()
-        except json.JSONDecodeError:
-            raise OAUTHException(code=-3,
-                                    msg='resp json err, path:{}, resp:{}'.format(path, resp.text),
-                                    errmsg=self.OAUTH_ERR_MSG)
-
-        logger.debug('url: {}, resp_data:{}'.format(url, data))
-        errcode = data.get('code')
-        if errcode == 0:
-            return data.get('data')
-        elif errcode in [1003, 1001]:
-            raise OAUTHLoginRequired(msg='{}'.format(data), errmsg=self.OAUTH_ERR_MSG)
-        else:
-            raise OAUTHRespCodeErr(code=-5,
-                                      msg='errcode:{}, msg:{}'.format(errcode, data.get('msg', '')),
-                                      errmsg=data.get('msg', ''))
+        return resp
 
     def set_token(self, token):
         self.token = token
@@ -86,12 +66,12 @@ class OAuthApi:
 
     def get_token(self, code):
         path = 'github.com/login/oauth/access_token'
-        # session = requests.Session()
-        data = dict(code=code, client_id=cfg['GH_CLIENT_ID'], client_secret=cfg['GH_CLIENT_SECRET'])
+        session = requests.Session()
+        data = dict(code=code, client_id=DevConfig.GH_CLIENT_ID, client_secret=DevConfig.GH_CLIENT_SECRET)
         header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
-        return self.req(path, json_data=data, method='POST', headers=header)# , session=session)
+        return self.req(path, json_data=data, method='POST', headers=header, session=session)
 
     def api(self):
-        basePath = 'api.github.com/user?access_token='
-        path = basePath + self.token
-        return self.req(path, method='GET', headers={'Accept': 'application/json'})
+        base = 'api.github.com/user?access_token='
+        path = base + self.token
+        return self.req(path, None, method='GET', headers={'Accept': 'application/json'})

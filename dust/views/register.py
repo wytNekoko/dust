@@ -1,12 +1,12 @@
 import ast
 import binascii
-import datetime
+from datetime import datetime
 import os
 from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from ..core import db, logger, oauth_client, redis_store
 from ..forms.register import UserRegisterForm
-from ..exceptions import FormValidationError
+from ..exceptions import FormValidationError, RegisterError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -27,15 +27,15 @@ class RegisterAuthGithub(MethodView):
     def post(self):
         code = request.get_json().get('code')
         resp = oauth_client.get_token(code)
-        logger.debug('### oauth_client resp', resp)
-        logger.debug('### oauth_client resp.data', resp.data)
-        logger.debug('### oauth_client resp.json', resp.json)
-        access_token = resp.json.get('access_token')
+        logger.debug('### oauth_client resp.json %s', resp.json())
+        access_token = resp.json().get('access_token')
+        if not access_token:
+            raise RegisterError()
         oauth_client.set_token(access_token)
-        user_info = oauth_client.api().json
-        logger.debug('### github user', user_info)
+        user_info = oauth_client.api().json()
+        logger.debug('### github user %s', user_info)
         u = User(username=user_info.get('login'))
-        u.git_account = user_info.get('email')
+        u.git_account = user_info.get('login')
         u.github_link = user_info.get('html_url')
         db.session.add(u)
         db.session.flush()

@@ -10,6 +10,8 @@ exceptions = [
     ('LoginInfoError', 1003, 'Wrong username or password.'),
     ('NoPermission', 1004, 'No permission.'),
     ('NoData', 1005, 'No such record.'),
+    ('LoginAuthError', 1006, 'Can\'t get access to github correctly'),
+    ('RegisterError', 1007, 'Can\'t get access to github correctly'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
