@@ -11,7 +11,7 @@ bp = Blueprint('profile', __name__, url_prefix='/profile')
 class OwnedPlanets(MethodView):
     def get(self):
         ps = current_user.owned_planets
-        return jsonify([{'name': p.name, 'dust_num': p.dust_num} for p in ps])
+        return jsonify([{'name': p.name, 'description': p.description, 'dust_num': p.dust_num} for p in ps])
 
 
 class BuildedPlanets(MethodView):
@@ -27,7 +27,8 @@ class BuildedPlanets(MethodView):
                 planets[p.name] = r.reward
 
         for k, v in planets.items():
-            ret.append(dict(name=k, reward_dust=v))
+            p = Planet.query.filter_by(name=k).first()
+            ret.append(dict(name=k, description=p.description, reward_dust=v))
         return jsonify(ret)
 
 
@@ -35,9 +36,16 @@ class MainProfile(MethodView):
     def get(self):
         ret = dict()
         ret['total_dust'] = current_user.owned_dust
-        ps = current_user.owned_planets
-        ret['planets'] = [{'created_at': p.created_at, 'name': p.name, 'reward': p.reward} for p in ps]
+        ret['github_link'] = current_user.github_link
+        # ps = current_user.owned_planets
+        # ret['planets'] = [{'created_at': p.created_at, 'name': p.name, 'reward': p.reward} for p in ps]
         return jsonify(ret)
+
+
+class PostedRewards(MethodView):
+    def get(self):
+        pr = current_user.bounty_rewards
+        return jsonify([{'name': p.name, 'description': p.description} for p in pr])
 
 
 bp.add_url_rule('/owned-planets', view_func=OwnedPlanets.as_view('owned_planets'))
