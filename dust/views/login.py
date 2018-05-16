@@ -29,12 +29,15 @@ class LoginView(MethodView):
             password=user.password,
             created_at=datetime.now(),
         ))
-        n = Notification(type=Notify.BUILD, uid=user.id)
-        db.session.add(n)
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
-        redis_store.set("%s:build_times" % user.id, 3, ex=expires_in)
-        n.content = NotifyContent.get(Notify.BUILD).format('3')
+
+        s = redis_store.get("%s:build_times" % user.id)
+        if not s:
+            n = Notification(type=Notify.BUILD, uid=user.id)
+            db.session.add(n)
+            redis_store.set("%s:build_times" % user.id, 3, ex=expires_in)
+            n.content = NotifyContent.get(Notify.BUILD).format('3')
         db.session.commit()
 
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())

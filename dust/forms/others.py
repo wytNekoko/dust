@@ -9,7 +9,7 @@ from ..constants import Status
 
 
 class FeedbackForm(JSONForm):
-    title = Field('title', [DataRequired(), Length(max=20, min=1)])
+    title = Field('title', [DataRequired(), Length(max=100, min=1)])
     content = StringField('content', [DataRequired(), Length(min=1)])
     type = StringField()
     email = StringField('email', [DataRequired(), Email()])

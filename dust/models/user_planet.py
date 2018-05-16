@@ -91,15 +91,15 @@ class Suggestion(db.Model, TimestampMixin):
     content = db.Column(db.TEXT, nullable=False, default='')
     email = db.Column(db.String(191), nullable=False, default='')
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
-    title = db.Column(db.String(50))
+    title = db.Column(db.String(100))
     type = db.Column(db.String(20))
 
 
 class BountyReward(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
                    comment='auto-generated random 7-digit-number')
-    name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
-    company_name = db.Column(db.String(20), nullable=False, default='')
+    name = db.Column(db.String(100), nullable=False, default='', comment='<=20 character')
+    company_name = db.Column(db.String(50), nullable=False, default='')
     description = db.Column(db.TEXT, nullable=False, default='')
     keywords = db.Column(db.String(100), nullable=False, default='')
     background = db.Column(db.TEXT, nullable=False, default='')

@@ -24,7 +24,7 @@ class RegisterView(MethodView):
 
 
 class AuthGithub(MethodView):
-    def post(self):
+    def get(self):
         content = request.get_data()
         y = content.decode("utf-8")
         x = ast.literal_eval(y)

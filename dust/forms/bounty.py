@@ -7,7 +7,7 @@ from ..models.user_planet import BountyReward, User
 
 
 class SetupBountyRewardForm(JSONForm):
-    name = Field('name', [DataRequired(), Length(max=20, min=1)])
+    name = Field('name', [DataRequired(), Length(max=100, min=1)])
     company_name = StringField()
     description = StringField('description', [DataRequired(), Length(min=1)])
     keywords = StringField('team')
