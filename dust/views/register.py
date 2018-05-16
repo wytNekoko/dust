@@ -26,10 +26,14 @@ class RegisterView(MethodView):
 class AuthGithub(MethodView):
     def get(self):
         content = request.get_data()
-        y = content.decode("utf-8")
-        x = ast.literal_eval(y)
-        code = x['code']
-        return {'code': code}
+        logger.debug('### auth request', request)
+        logger.debug('### auth get_data', content)
+        logger.debug('### auth get_json', request.get_json())
+        # y = content.decode("utf-8")
+        # x = ast.literal_eval(y)
+        # code = x['code']
+        # return {'code': code}
+        return request
 
 
 class RegisterAuthGithub(MethodView):
