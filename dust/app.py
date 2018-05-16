@@ -54,7 +54,7 @@ def before_request(app):
             raise LoginRequired
 
         user = User.query.get(uid)
-        if not user or user.password != cache_data['password']:
+        if not user:  # or user.password != cache_data['password']:
             raise LoginRequired
 
         # 设置user

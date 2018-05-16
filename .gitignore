@@ -10,3 +10,6 @@ test*
 
 # db
 db_create*
+
+# config
+dust/config.py

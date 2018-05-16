@@ -6,7 +6,7 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from ..core import db, logger, oauth_client, redis_store
 from ..forms.register import UserRegisterForm
-from ..exceptions import FormValidationError, RegisterError
+from ..exceptions import FormValidationError, RegisterError, DuplicateGithubUser
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -33,7 +33,9 @@ class RegisterAuthGithub(MethodView):
             raise RegisterError()
         oauth_client.set_token(access_token)
         user_info = oauth_client.api().json()
-        logger.debug('### github user %s', user_info)
+        u1 = User.query.get_by_username(user_info.get('login'))
+        if u1:
+            raise DuplicateGithubUser()
         u = User(username=user_info.get('login'))
         u.git_account = user_info.get('login')
         u.github_link = user_info.get('html_url')
