@@ -102,5 +102,5 @@ class BuildPlanetForm(JSONForm):
         db.session.commit()
         t = redis_store.get("%s:build_times" % current_user.id)
         tleft = redis_store.ttl("%s:build_times" % current_user.id)
-        redis_store.set("%s:build_times" % current_user.id, t-1, ex=tleft)
+        redis_store.set("%s:build_times" % current_user.id, int(t)-1, ex=tleft)
         return record

@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 
 from ..core import redis_store,  db, oauth_client
-from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError
+from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError, RegisterFailError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -61,6 +61,8 @@ class LoginAuthGithub(MethodView):
         oauth_client.set_token(access_token)
         user_info = oauth_client.api().json()
         user = User.get_by_username(user_info.get('login'))
+        if not user:
+            raise RegisterFailError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             id=user.id,

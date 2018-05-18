@@ -33,7 +33,7 @@ class RegisterAuthGithub(MethodView):
             raise RegisterError()
         oauth_client.set_token(access_token)
         user_info = oauth_client.api().json()
-        u1 = User.query.get_by_username(user_info.get('login'))
+        u1 = User.get_by_username(user_info.get('login'))
         if u1:
             raise DuplicateGithubUser()
         u = User(username=user_info.get('login'))

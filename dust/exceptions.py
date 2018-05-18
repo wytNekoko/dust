@@ -13,6 +13,7 @@ exceptions = [
     ('LoginAuthError', 1006, 'Can\'t get access to github correctly'),
     ('RegisterError', 1007, 'Can\'t get access to github correctly'),
     ('DuplicateGithubUser', 1008, 'This github account/username has been registered. Please login directly.'),
+    ('RegisterFailError', 1009, 'This github account hasn\'t been registered correctly. Please register again.'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
