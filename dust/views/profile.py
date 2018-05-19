@@ -19,6 +19,8 @@ class BuildedPlanets(MethodView):
     def get(self, username):
         user = User.get_by_username(username)
         rd = BuildRecord.query.filter_by(builder_id=user.id).all()
+        if not rd:
+            return jsonify()
         ret = list()
         planets = dict()
         for r in rd:
