@@ -11,10 +11,11 @@ from ..constants import Status
 class SetupPlanetForm(JSONForm):
     name = Field('name', [DataRequired(), Length(max=20, min=1)])
     description = StringField('description', [DataRequired(), Length(min=1)])
-    demo_url = StringField('demo_url', [URL()])
-    github_url = StringField('github_url', [URL()])
+    keywords = StringField('keywords', [DataRequired(), Length(min=1)])
+    demo_url = StringField('demo_url', [DataRequired(), URL()])
+    github_url = StringField('github_url', [DataRequired(), URL()])
     team_intro = StringField('team')
-    email = StringField('email', [Email()])
+    email = StringField('email', [DataRequired(), Email()])
 
     def __init__(self, uid=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,9 +37,10 @@ class SetupPlanetForm(JSONForm):
         else:
             p = Planet(owner_id=self.uid)
             db.session.add(p)
-            p.dust_num = 500
+            p.dust_num = 100
         p.name = self.name.data
         p.description = self.description.data
+        p.keywords = self.keywords.data
         p.demo_url = self.demo_url.data
         p.github_url = self.github_url.data
         p.team_intro = self.team_intro.data
@@ -51,8 +53,8 @@ class SetupPlanetForm(JSONForm):
             owner = User.query.get_or_404(owner_id)
         else:
             owner = current_user
-        owner.owned_dust += 500
-        owner.planet_dust_sum += 500
+        owner.owned_dust += 100
+        owner.planet_dust_sum += 100
         return self.save()
 
 
@@ -82,10 +84,10 @@ class BuildPlanetForm(JSONForm):
             db.session.commit()
             raise ValidationError('Build timeout.')
 
-    def validate_build_times(self):
-        t = redis_store.get("%s:build_times" % current_user.id)
-        if t <= 0:
-            raise ValidationError('Today\'s three times have been used. Please build tomorrow.')
+    # def validate_build_times(self):
+    #     t = redis_store.get("%s:build_times" % current_user.id)
+    #     if t <= 0:
+    #         raise ValidationError('Today\'s three times have been used. Please build tomorrow.')
 
     def build(self):
         record = BuildRecord(builder_id=current_user.id)
@@ -100,7 +102,7 @@ class BuildPlanetForm(JSONForm):
         db.session.flush()
         record.planet_dust = self.planet.dust_num
         db.session.commit()
-        t = redis_store.get("%s:build_times" % current_user.id)
-        tleft = redis_store.ttl("%s:build_times" % current_user.id)
-        redis_store.set("%s:build_times" % current_user.id, int(t)-1, ex=tleft)
+        # t = redis_store.get("%s:build_times" % current_user.id)
+        # tleft = redis_store.ttl("%s:build_times" % current_user.id)
+        # redis_store.set("%s:build_times" % current_user.id, int(t)-1, ex=tleft)
         return record

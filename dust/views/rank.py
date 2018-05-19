@@ -40,6 +40,17 @@ class BountyView(MethodView):
         return jsonify(ret)
 
 
+class HackerView(MethodView):
+    def get(self):
+        ret = list()
+        hs = User.query.order_by(User.owned_dust.desc())
+        for h in hs:
+            x = dict(hacker=h.name, project_num=len(h.owned_planets), gift=h.owned_dust)
+            ret.append(x)
+        return jsonify(ret)
+
+
 bp.add_url_rule('/dashboard', view_func=DashboardView.as_view('rank_dashboard'))
 bp.add_url_rule('/winners', view_func=WinnerView.as_view('rank_winners'))
 bp.add_url_rule('/bounty', view_func=BountyView.as_view('rank_bounty'))
+bp.add_url_rule('/hacker', view_func=HackerView.as_view('rank_hackers'))

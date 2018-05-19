@@ -25,14 +25,14 @@ class GetDustView(MethodView):
                 if not t:
                     redis_store.hmset(current_user.id, dict(tag=i))
                     redis_store.expire(current_user.id, expire)
-                    current_user.owned_dust += 88
+                    current_user.owned_dust += 10
                     db.session.commit()
                     return jsonify(current_user.owned_dust)
                 elif not int(t.get('tag')) == i:
                     redis_store.delete(current_user.id)
                     redis_store.hmset(current_user.id, dict(tag=i))
                     redis_store.expire(current_user.id, expire)
-                    current_user.owned_dust += 88
+                    current_user.owned_dust += 10
                     db.session.commit()
                     return jsonify(current_user.owned_dust)
                 else:
@@ -73,9 +73,9 @@ class SpyView(MethodView):
             name = request.get_json().get('planet_name', '')
             p = Planet.query.filter_by(name=name).first()
         if p:
-            if current_user.owned_dust <= 1000:
+            if current_user.owned_dust <= 100:
                 raise NoDust()
-            current_user.owned_dust -= 1000
+            current_user.owned_dust -= 100
             n = Notification(type=Notify.SPY, uid=current_user.id)
             n.content = NotifyContent.get(Notify.SPY).format(p.name, p.email)
             db.session.add(n)

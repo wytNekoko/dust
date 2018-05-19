@@ -46,12 +46,12 @@ class RegisterAuthGithub(MethodView):
             id=u.id,
             created_at=datetime.now(),
         ))
-        n = Notification(type=Notify.BUILD, uid=u.id)
-        db.session.add(n)
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
-        redis_store.set("%s:build_times" % u.id, 3, ex=expires_in)
-        n.content = NotifyContent.get(Notify.BUILD).format('3')
+        # n = Notification(type=Notify.BUILD, uid=u.id)
+        # db.session.add(n)
+        # redis_store.set("%s:build_times" % u.id, 3, ex=expires_in)
+        # n.content = NotifyContent.get(Notify.BUILD).format('3')
         db.session.commit()
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=u.todict())
 

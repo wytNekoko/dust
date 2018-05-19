@@ -11,11 +11,11 @@ def distribute(pid, amount):
     records = BuildRecord.query.filter_by(planet_id=pid).all()
     denominator = 0
     for record in records:
-        factor = 500 / record.planet_dust
+        factor = 100 / record.planet_dust
         denominator += record.dust_num * factor
 
     for record in records:
-        factor = 500 / record.planet_dust
+        factor = 100 / record.planet_dust
         builder = User.query.get(record.builder_id)
         income = amount * record.dust_num * factor / denominator
         builder.owned_dust += income

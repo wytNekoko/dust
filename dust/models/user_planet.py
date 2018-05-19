@@ -27,8 +27,8 @@ class User(db.Model, TimestampMixin):
                    comment='auto-generated random 7-digit-number')
     username = db.Column(db.String(20), nullable=False, default='', unique=True)
     _password = db.Column('password', db.String(191), comment='password')
-    # email = db.Column(db.String(191), nullable=False, default='')
-    owned_dust = db.Column(db.Integer, nullable=False, default=5000, comment='<=20 character')
+    email = db.Column(db.String(191), nullable=False, default='')
+    owned_dust = db.Column(db.Integer, nullable=False, default=100, comment='<=20 character')
     is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor')
     is_captain = db.Column(db.Boolean, nullable=False, default=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
@@ -65,6 +65,7 @@ class User(db.Model, TimestampMixin):
 class Planet(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
+    keywords = db.Column(db.String(50), nullable=False, default='')
     description = db.Column(db.String(5000))
     demo_url = db.Column(db.String(191))
     github_url = db.Column(db.String(191))
