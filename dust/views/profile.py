@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
-from ..models.user_planet import BuildRecord, Planet
+from ..models.user_planet import BuildRecord, Planet, User
 from ..core import current_user, db
 from ..exceptions import FormValidationError, NoData
 
@@ -9,14 +9,16 @@ bp = Blueprint('profile', __name__, url_prefix='/profile')
 
 
 class OwnedPlanets(MethodView):
-    def get(self):
-        ps = current_user.owned_planets
+    def get(self, username):
+        user = User.get_by_username(username)
+        ps = user.owned_planets
         return jsonify([{'name': p.name, 'description': p.description, 'dust_num': p.dust_num} for p in ps])
 
 
 class BuildedPlanets(MethodView):
-    def get(self):
-        rd = BuildRecord.query.filter_by(builder_id=current_user.id).all()
+    def get(self, username):
+        user = User.get_by_username(username)
+        rd = BuildRecord.query.filter_by(builder_id=user.id).all()
         ret = list()
         planets = dict()
         for r in rd:
@@ -48,6 +50,13 @@ class PostedRewards(MethodView):
         return jsonify([{'name': p.name, 'description': p.description} for p in pr])
 
 
-bp.add_url_rule('/owned-planets', view_func=OwnedPlanets.as_view('owned_planets'))
-bp.add_url_rule('/builded-planets', view_func=BuildedPlanets.as_view('builded_planets'))
+class Hacker(MethodView):
+    def get(self, username):
+        u = User.get_by_username(username)
+        return jsonify({'name': u.name, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
+
+
+bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
+bp.add_url_rule('/owned-planets/<string:username>', view_func=OwnedPlanets.as_view('owned_planets'))
+bp.add_url_rule('/builded-planets/<string:username>', view_func=BuildedPlanets.as_view('builded_planets'))
 bp.add_url_rule('/main', view_func=MainProfile.as_view('main_profile'))
