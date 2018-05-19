@@ -55,7 +55,7 @@ class PostedRewards(MethodView):
 class Hacker(MethodView):
     def get(self, username):
         u = User.get_by_username(username)
-        return jsonify({'name': u.name, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
+        return jsonify({'name': u.username, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
 
 
 bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
