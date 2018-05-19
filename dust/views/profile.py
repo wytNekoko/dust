@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
-\
+
 from ..core import current_user, db
 from ..exceptions import FormValidationError, NoData
 
