@@ -43,7 +43,7 @@ class BountyView(MethodView):
 class HackerView(MethodView):
     def get(self):
         ret = list()
-        hs = User.query.order_by(User.owned_dust.desc())
+        hs = User.query.order_by(User.planet_dust_sum.desc())
         for h in hs:
             x = dict(hacker=h.username, project_num=len(h.owned_planets), gift=h.planet_dust_sum)
             ret.append(x)
