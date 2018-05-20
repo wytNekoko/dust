@@ -31,6 +31,11 @@ class SetupPlanetForm(JSONForm):
         if e:
             raise ValidationError('This github project already exits.')
 
+    def validate_demo_url(self, field):
+        e = Planet.query.filter_by(github_url=field.data).first()
+        if e:
+            raise ValidationError('This demo already exits.')
+
     def save(self, pid=None):
         if pid:
             p = Planet.query.get_or_404(pid)
