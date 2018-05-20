@@ -10,12 +10,12 @@ from ..constants import Status
 
 class SetupPlanetForm(JSONForm):
     name = Field('name', [DataRequired(), Length(max=20, min=1)])
-    description = StringField('description', [DataRequired(), Length(min=1)])
+    email = StringField('email', [DataRequired(), Email()])
     keywords = StringField('keywords', [DataRequired(), Length(min=1)])
+    description = StringField('description', [DataRequired(), Length(min=1)])
     demo_url = StringField('demo_url', [DataRequired(), URL()])
     github_url = StringField('github_url', [DataRequired(), URL()])
     team_intro = StringField('team')
-    email = StringField('email', [DataRequired(), Email()])
 
     def __init__(self, uid=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,12 +24,12 @@ class SetupPlanetForm(JSONForm):
     def validate_name(self, field):
         e = Planet.query.filter_by(name=field.data).first()
         if e:
-            raise ValidationError('Duplicate planet name')
+            raise ValidationError('Duplicate project name')
 
     def validate_github_url(self, field):
         e = Planet.query.filter_by(github_url=field.data).first()
         if e:
-            raise ValidationError('This project already exits as a planet.')
+            raise ValidationError('This github project already exits.')
 
     def save(self, pid=None):
         if pid:
