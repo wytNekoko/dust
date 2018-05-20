@@ -21,8 +21,8 @@ class FeedbackView(MethodView):
 
 
 class GetNotificationView(MethodView):
-    def get(self):
-        ns = Notification.query.order_by(Notification.created_at.desc()).all()
+    def get(self, uid):
+        ns = Notification.query.filter_by(uid=uid).order_by(Notification.created_at.desc()).all()
         ret = list()
         for n in ns:
             x = n.todict()
@@ -32,4 +32,4 @@ class GetNotificationView(MethodView):
 
 
 bp.add_url_rule('/feedback', view_func=FeedbackView.as_view('feedback'))
-bp.add_url_rule('/notifications', view_func=GetNotificationView.as_view('notification'))
+bp.add_url_rule('/notifications/<string:uid>', view_func=GetNotificationView.as_view('notification'))
