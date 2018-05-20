@@ -45,7 +45,7 @@ class HackerView(MethodView):
         ret = list()
         hs = User.query.order_by(User.owned_dust.desc())
         for h in hs:
-            x = dict(hacker=h.username, project_num=len(h.owned_planets), gift=h.owned_dust)
+            x = dict(hacker=h.username, project_num=len(h.owned_planets), gift=h.planet_dust_sum)
             ret.append(x)
         return jsonify(ret)
 

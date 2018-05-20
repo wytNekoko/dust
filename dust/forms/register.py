@@ -19,6 +19,11 @@ class UserRegisterForm(JSONForm):
         if e:
             raise ValidationError('Duplicate username')
 
+    def validate_email(self, field):
+        e = User.query.filter_by(email=field.data).first()
+        if e:
+            raise ValidationError('Duplicate Email')
+
     def save(self, uid=None):
         if uid:
             user = User.query.get_or_404(uid)
