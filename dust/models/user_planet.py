@@ -64,7 +64,7 @@ class User(db.Model, TimestampMixin):
 
 class Planet(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
+    name = db.Column(db.String(50), nullable=False, default='', comment='<=20 character')
     keywords = db.Column(db.String(50), nullable=False, default='')
     description = db.Column(db.String(5000))
     demo_url = db.Column(db.String(191))

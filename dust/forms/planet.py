@@ -9,7 +9,7 @@ from ..constants import Status
 
 
 class SetupPlanetForm(JSONForm):
-    name = Field('name', [DataRequired(), Length(max=20, min=1)])
+    name = Field('name', [DataRequired(), Length(max=50, min=1)])
     email = StringField('email', [DataRequired(), Email()])
     keywords = StringField('keywords', [DataRequired(), Length(min=1)])
     description = StringField('description', [DataRequired(), Length(min=1)])
