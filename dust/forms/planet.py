@@ -11,7 +11,7 @@ from ..constants import Status
 class SetupPlanetForm(JSONForm):
     name = Field('name', [DataRequired(), Length(max=30, min=1)])
     email = StringField('email', [DataRequired(), Email()])
-    keywords = StringField('keywords', [DataRequired(), Length(max=47, min=1)])
+    keywords = StringField('keywords', [DataRequired(), Length(max=32, min=1)])
     description = StringField('description', [DataRequired(), Length(min=1)])
     demo_url = StringField('demo_url', [DataRequired(), URL()])
     github_url = StringField('github_url', [DataRequired(), URL()])
