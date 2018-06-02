@@ -6,7 +6,7 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from ..core import db, logger, oauth_client, redis_store
 from ..forms.register import UserRegisterForm
-from ..exceptions import FormValidationError, RegisterError, DuplicateGithubUser
+from ..exceptions import FormValidationError, RegisterError, DuplicateGithubUser, RegisterFailError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -76,9 +76,12 @@ class RegisterKCash(MethodView):
         db.session.flush()
         u.owned_dust += 50
         resp = oauth_client.star('truechain', 'truechain-consensus-core')
-        logger.debug('###star truechain resp: ', resp)
-        resp = oauth_client.check_star('truechain', 'truechain-consensus-core')
-        logger.debug('###check_star truechain resp: ', resp)
+        resp.raise_for_status()
+        r2 = oauth_client.check_star('truechain', 'truechain-consensus-core')
+        r2.raise_for_status()
+        if not resp.ok:
+            logger.debug('### star resp.headers', resp.headers)
+            raise RegisterFailError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             id=u.id,
