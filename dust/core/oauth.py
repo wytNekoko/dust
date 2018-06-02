@@ -78,10 +78,11 @@ class OAuthApi:
 
     def star(self, owner, repo):
         base = 'api.github.com/user/starred/' + owner + '/' + repo
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'token ' + self.token}
+        logger.debug('###star url', base)
+        headers = {'Accept': 'application/json', 'Content-Length': 0, 'Authorization': 'token ' + self.token}
         return self.req(base, None, method='PUT', headers=headers)
 
     def check_star(self, owner, repo):
         base = 'api.github.com/user/starred/' + owner + '/' + repo
-        headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'token ' + self.token}
+        headers = {'Accept': 'application/json', 'Authorization': 'token ' + self.token}
         return self.req(base, None, method='GET', headers=headers)
