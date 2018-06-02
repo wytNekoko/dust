@@ -71,7 +71,17 @@ class OAuthApi:
         header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         return self.req(path, json_data=data, method='POST', headers=header, session=session)
 
-    def api(self):
+    def user(self):
         base = 'api.github.com/user?access_token='
         path = base + self.token
         return self.req(path, None, method='GET', headers={'Accept': 'application/json'})
+
+    def star(self, owner, repo):
+        base = 'api.github.com/user/starred/' + owner + '/' + repo
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'token ' + self.token}
+        return self.req(base, None, method='PUT', headers=headers)
+
+    def check_star(self, owner, repo):
+        base = 'api.github.com/user/starred/' + owner + '/' + repo
+        headers = {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': 'token ' + self.token}
+        return self.req(base, None, method='GET', headers=headers)

@@ -37,7 +37,7 @@ class User(db.Model, TimestampMixin):
     github_link = db.Column(db.String(191), nullable=False, default='')
     build_reward_dust = db.Column(db.Integer, nullable=False, default=0)
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
-
+    kcash = db.Column(db.String(150), nullable=False, default='', comment='KCash address')
     # one-to-many
     owned_planets = db.relationship('Planet')
     suggestions = db.relationship('Suggestion')

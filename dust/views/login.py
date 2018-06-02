@@ -59,7 +59,7 @@ class LoginAuthGithub(MethodView):
         if not access_token:
             raise LoginAuthError()
         oauth_client.set_token(access_token)
-        user_info = oauth_client.api().json()
+        user_info = oauth_client.user().json()
         user = User.get_by_username(user_info.get('login'))
         if not user:
             raise RegisterFailError()
