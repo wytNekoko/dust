@@ -59,6 +59,7 @@ class RegisterKCash(MethodView):
     def post(self):
         code = request.get_json().get('code')
         kcash_addr = request.get_json().get('addr')
+        invite = request.get_json().get('invite')
         resp = oauth_client.get_token(code)
         access_token = resp.json().get('access_token')
         if not access_token:
@@ -72,6 +73,7 @@ class RegisterKCash(MethodView):
         u.git_account = user_info.get('login')
         u.github_link = user_info.get('html_url')
         u.kcash = kcash_addr
+        u.invitation_code = invite
         db.session.add(u)
         db.session.flush()
         u.owned_dust += 50
