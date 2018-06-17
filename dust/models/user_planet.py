@@ -4,7 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..core import db
 from . import TimestampMixin
-from ..constants import Status
+from ..constants import Status, Role
 
 
 team_user_table = db.Table(
@@ -20,6 +20,37 @@ class Team(db.Model, TimestampMixin):
     name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
     # many-to-many
     users = db.relationship('User', secondary=team_user_table)
+    # one-to-many
+    project = db.relationship('Project')
+    votes = db.Column(db.SmallInteger, nullable=False, default=3, comment='number to vote')
+    ballot = db.Column(db.SmallInteger, nullable=False, default=0, comment='received number')
+    judges = db.Column(db.SmallInteger, nullable=False, default=0, comment='votes from judges')
+
+
+class Project(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, default='')
+    git = db.Column(db.String(191), nullable=False, default='')
+    description = db.Column(db.String(3000), nullable=False, default='')
+    demo = db.Column(db.String(191), nullable=False, default='')
+    logo = db.Column(db.String(191), nullable=False, default='', comment='url for logo')
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
+    photos = db.relationship('DemoPhoto', cascade="all, delete-orphan")
+
+
+class DemoPhoto(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    url = db.Column(db.String(191), nullable=False, default='')
+
+
+class Competition(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, default='')
+    rules = db.Column(db.TEXT)
+    time = db.Column(db.String(50))
+    place = db.Column(db.String(70))
+    teams = db.relationship('Team')
 
 
 class User(db.Model, TimestampMixin):
@@ -29,15 +60,18 @@ class User(db.Model, TimestampMixin):
     _password = db.Column('password', db.String(191), comment='password')
     email = db.Column(db.String(191), nullable=False, default='')
     owned_dust = db.Column(db.Integer, nullable=False, default=100, comment='<=20 character')
-    is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor')
-    is_captain = db.Column(db.Boolean, nullable=False, default=True)
+    is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor/judge')
+    votes = db.Column(db.Integer, nullable=False, default=0, comment='number to vote for judge')
+    is_captain = db.Column(db.Boolean, nullable=False, default=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    role = db.Column(db.SmallInteger, nullable=False, default=Role.EXTRA, comment='Role of hacker')
     git_account = db.Column(db.String(191), nullable=False, default='')
     fb_account = db.Column(db.String(191), nullable=False, default='')
     github_link = db.Column(db.String(191), nullable=False, default='')
     build_reward_dust = db.Column(db.Integer, nullable=False, default=0)
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
     kcash = db.Column(db.String(150), nullable=False, default='', comment='KCash address')
+    eth = db.Column(db.String(150), nullable=False, default='', comment='Eth address')
     invitation_code = db.Column(db.String(50), nullable=False, default='')
     # one-to-many
     owned_planets = db.relationship('Planet')
@@ -67,7 +101,7 @@ class Planet(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, default='', comment='<=20 character')
     keywords = db.Column(db.String(50), nullable=False, default='')
-    description = db.Column(db.String(5000))
+    description = db.Column(db.String(2000))
     demo_url = db.Column(db.String(191))
     github_url = db.Column(db.String(191))
     team_intro = db.Column(db.String(5000))
@@ -116,3 +150,4 @@ class Notification(db.Model, TimestampMixin):
     content = db.Column(db.String(200), nullable=False, default='')
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
     type = db.Column(db.SmallInteger, nullable=False)
+
