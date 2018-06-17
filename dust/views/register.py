@@ -72,7 +72,7 @@ class RegisterKCash(MethodView):
         u = User(username=user_info.get('login'))
         u.git_account = user_info.get('login')
         u.github_link = user_info.get('html_url')
-        u.kcash = kcash_addr
+        u.gift_addr = kcash_addr
         u.invitation_code = invite
         db.session.add(u)
         db.session.flush()

@@ -57,8 +57,12 @@ class User(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
                    comment='auto-generated random 7-digit-number')
     username = db.Column(db.String(20), nullable=False, default='', unique=True)
+    realname = db.Column(db.String(20), nullable=False, default='')
+    city = db.Column(db.String(500), nullable=False, default='')
+    avatar = db.Column(db.String(191), nullable=False, default='')
     _password = db.Column('password', db.String(191), comment='password')
     email = db.Column(db.String(191), nullable=False, default='')
+    organization = db.Column(db.String(200), nullable=False, default='')
     owned_dust = db.Column(db.Integer, nullable=False, default=100, comment='<=20 character')
     is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor/judge')
     votes = db.Column(db.Integer, nullable=False, default=0, comment='number to vote for judge')
@@ -70,8 +74,9 @@ class User(db.Model, TimestampMixin):
     github_link = db.Column(db.String(191), nullable=False, default='')
     build_reward_dust = db.Column(db.Integer, nullable=False, default=0)
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
-    kcash = db.Column(db.String(150), nullable=False, default='', comment='KCash address')
+    gift_addr = db.Column(db.String(150), nullable=False, default='', comment='KCash Gift address')
     eth = db.Column(db.String(150), nullable=False, default='', comment='Eth address')
+    slogan = db.Column(db.String(500), nullable=False, default='', comment='Slogan for teaming up')
     invitation_code = db.Column(db.String(50), nullable=False, default='')
     # one-to-many
     owned_planets = db.relationship('Planet')
