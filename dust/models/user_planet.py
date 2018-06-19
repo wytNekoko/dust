@@ -21,6 +21,7 @@ class Team(db.Model, TimestampMixin):
     # many-to-many
     users = db.relationship('User', secondary=team_user_table)
     # one-to-many
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
     project = db.relationship('Project')
     votes = db.Column(db.SmallInteger, nullable=False, default=3, comment='number to vote')
     ballot = db.Column(db.SmallInteger, nullable=False, default=0, comment='received number')

@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from wtforms import StringField, Field, IntegerField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, NumberRange, URL
-from flask import request
 from . import JSONForm
 from ..core import current_user, db, redis_store
 from ..models.user_planet import Planet, User, BuildRecord
