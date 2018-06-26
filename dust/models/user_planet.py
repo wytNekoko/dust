@@ -211,7 +211,7 @@ class CoinGithub(db.Model, TimestampMixin):
 
 
 class ContributeRecord(db.Model, TimestampMixin):
-    id = db.Column(db.Intcger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     author_avatar = db.Column(db.String(191))
     author_id = db.Column(db.Integer)
     author_login = db.Column(db.String(50))
@@ -223,14 +223,14 @@ class ContributeRecord(db.Model, TimestampMixin):
 
 
 class Contributor(db.Model, TimestampMixin):
-    id = db.Column(db.Intcger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     author_avatar = db.Column(db.String(191))
     author_login = db.Column(db.String(50))
     total_commit = db.Column(db.Integer)
 
 
 class WithdrawRecord(db.Model, TimestampMixin):
-    id = db.Column(db.Intcger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
     amount = db.Column(db.Integer)
     after = db.Column(db.Integer)
