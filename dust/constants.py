@@ -4,6 +4,12 @@ class Status:
     UNSHELVED = 99
 
 
+class Note:
+    UNREAD = 1
+    READ = 2
+    DELETED = 0
+
+
 class Feedback:
     ADVICE = 0
     COOPERATION = 1

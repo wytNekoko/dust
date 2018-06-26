@@ -4,7 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from ..core import db
 from . import TimestampMixin
-from ..constants import Status, Role
+from ..constants import *
 
 
 team_user_table = db.Table(
@@ -72,7 +72,7 @@ class User(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
                    comment='auto-generated random 7-digit-number')
     username = db.Column(db.String(20), nullable=False, default='', unique=True)
-    realname = db.Column(db.String(20), nullable=False, default='')
+    hacker_name = db.Column(db.String(20), nullable=False, default='')
     city = db.Column(db.String(500), nullable=False, default='')
     avatar = db.Column(db.String(191), nullable=False, default='')
     _password = db.Column('password', db.String(191), comment='password')
@@ -186,6 +186,7 @@ class Notification(db.Model, TimestampMixin):
     from_uid = db.Column(db.Integer, nullable=False, default=0)
     to_uid = db.Column(db.Integer, nullable=False, default=0)
     type = db.Column(db.SmallInteger, nullable=False)
+    status = db.Column(db.SmallInteger, nullable=False, default=Note.UNREAD)
 
 
 class UploadRecord(db.Model, TimestampMixin):

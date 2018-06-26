@@ -84,8 +84,15 @@ class TeamList(MethodView):
         return jsonify(res)
 
 
+class Attender(MethodView):
+    def get(self, role):
+        us = User.query.filter_by(is_hacker=True, role=role)
+        return [dict(url=u.avatar, name=u.hacker_name, intro=u.slogan) for u in us]
+
+
 bp.add_url_rule('/manage', view_func=TeamView.as_view('team_manage'))
 bp.add_url_rule('/add-member', view_func=AddMember.as_view('team_add_member'))
 bp.add_url_rule('/leave', view_func=LeaveTeam.as_view('team_leave'))
 bp.add_url_rule('/<string:team_id>', view_func=TeamDetail.as_view('team_detail'))
 bp.add_url_rule('/list/<int:status>', view_func=TeamList.as_view('team_list'))
+bp.add_url_rule('/attanders/<string:role>', view_func=Attender.as_view('attender'))
