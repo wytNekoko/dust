@@ -24,13 +24,13 @@ NotifyContent = {
 
 
 class Role:
-    JUDGE = 0
-    EXTRA = 1
-    FULL_STACK = 2
-    DESIGNER = 3
-    DAPPS = 4
-    SECURITY = 5
-    PUBLIC_CHAIN = 6
+    JUDGE = 'Judge'
+    EXTRA = 'Hacker'
+    FULL_STACK = 'Full Stack'
+    DESIGNER = 'Designer'
+    DAPPS = 'DApps'
+    SECURITY = 'Security'
+    PUBLIC_CHAIN = 'Public Chain'
 
 
 

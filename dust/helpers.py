@@ -27,6 +27,25 @@ def register_blueprints(app, import_path, bp_name='bp'):
             app.register_blueprint(bp)
 
 
+def register_api(bp, view_cls, endpoint, url, pk='item_id', pk_type='int'):
+    """register restful api router
+
+    :param bp: flask.BluePrint object
+    :param view_cls: flask.views.View class
+    :param endpoint: endpint
+    :param url: url path, eg: /users/
+    :param pk: entity id variable name
+    :param pk_type: http://flask.pocoo.org/docs/0.12/quickstart/#variable-rules
+    """
+    view_func = view_cls.as_view(endpoint)
+    bp.add_url_rule(url, defaults={pk: None},
+                    view_func=view_func, methods=['GET'])
+    bp.add_url_rule(url, view_func=view_func, methods=['POST'])
+    bp.add_url_rule('{0}<{1}:{2}>'.format(url, pk_type, pk),
+                    view_func=view_func,
+                    methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+
+
 class TodictModel(object):
     _todict_include = None
     _todict_exclude = None

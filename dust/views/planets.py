@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify
 from flask.views import MethodView
 from sqlalchemy import func
 
-from ..models.user_planet import Planet
+from ..models.user_planet import *
 from ..exceptions import NoData
 from ..constants import Status
 
@@ -63,6 +63,13 @@ class RankListView(MethodView):
             x = planets[index].todict()
             x['rank'] = index + 1
             ret.append(x)
+        return jsonify(ret)
+
+
+class ProjectView(MethodView):
+    def get(self):
+        ps = Project.query.all()
+        ret = [p.todict() for p in ps]
         return jsonify(ret)
 
 

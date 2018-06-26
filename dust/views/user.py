@@ -2,12 +2,15 @@ from datetime import datetime, time
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
-from ..models.user_planet import User, Planet, Notification
+
+from ..models.user_planet import *
 from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..forms.bounty import *
+from ..forms.upload import *
 from ..core import current_user, db, redis_store
 from ..exceptions import FormValidationError, NoData, NoDust
 from ..constants import Notify, NotifyContent
+from ..helpers import register_api
 
 bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -95,8 +98,75 @@ class SetupBountyView(MethodView):
             raise FormValidationError(form)
 
 
+class FollowView(MethodView):
+    def post(self):
+        n = request.get_json().get('name')
+        other = User.query.filter_by(username=n)
+        current_user.follow(other)
+        db.session.commit()
+        return jsonify('follow success')
+
+    def delete(self, item_id):
+        other = User.query.get(item_id)
+        current_user.unfollow(other)
+        db.session.commit()
+        return jsonify('unfollow success')
+
+
+class UploadProject(MethodView):
+    def post(self):
+        form = ProjectForm()
+        if form.validate():
+            p = form.create()
+            return p.todict()
+        else:
+            raise FormValidationError(form)
+
+
+class SetProject(MethodView):
+    def post(self):
+        form = ProjectForm()
+        if form.validate():
+            t = Team.query.get(current_user.cteam_id)
+            p = form.set(t.project.id)
+            return p.todict()
+        else:
+            raise FormValidationError(form)
+
+
+class UploadInfo(MethodView):
+    def post(self):
+        form = AttenderForm()
+        if form.validate():
+            u = form.save()
+            return u.todict()
+        else:
+            raise FormValidationError(form)
+
+
+class CheckTeam(MethodView):
+    def get(self):
+        ret = dict()
+        if current_user.cteam_id == 0:
+            ret['inTeam'] = False
+            ret['isLeader'] = False
+            return ret
+        ret['inTeam'] = True
+        tt = Team.query.get(current_user.cteam_id)
+        if tt.captain_id == current_user.id:
+            ret['isLeader'] = True
+        else:
+            ret['isLeader'] = False
+        return ret
+
+
+register_api(bp, FollowView, 'follow', '/follow')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
 bp.add_url_rule('/spy/<string:planet_name>', view_func=SpyView.as_view('spy'))
 bp.add_url_rule('/bounty', view_func=SetupBountyView.as_view('setup_bounty'))
+bp.add_url_rule('/up-project', view_func=UploadProject.as_view('upload_project'))
+bp.add_url_rule('/set-project', view_func=SetProject.as_view('set_project'))
+bp.add_url_rule('/upload-info', view_func=UploadInfo.as_view('upload_info'))
+bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))

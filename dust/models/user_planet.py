@@ -15,13 +15,17 @@ team_user_table = db.Table(
 
 
 class Team(db.Model, TimestampMixin):
-    id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(1000001, 9999999),
+    id = db.Column(db.Integer, primary_key=True, default=lambda: random.randint(10001, 99999),
                    comment='auto-generated random 7-digit-number')
-    name = db.Column(db.String(20), nullable=False, default='', comment='<=20 character')
+    name = db.Column(db.String(50), nullable=False, default='', comment='<=20 character')
+    is_completed = db.Column(db.Boolean, nullable=False, default=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True, comment='Current competition')
     # many-to-many
-    users = db.relationship('User', secondary=team_user_table)
-    # one-to-many
+    users = db.relationship('User', secondary=team_user_table, back_populates='teams')
+    # many-to-one
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'))
+    captain_id = db.Column(db.Integer, nullable=False, default=0)
+    # one-to-many
     project = db.relationship('Project')
     votes = db.Column(db.SmallInteger, nullable=False, default=3, comment='number to vote')
     ballot = db.Column(db.SmallInteger, nullable=False, default=0, comment='received number')
@@ -44,6 +48,9 @@ class DemoPhoto(db.Model, TimestampMixin):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     url = db.Column(db.String(191), nullable=False, default='')
 
+    def todict_simple(self):
+        return self.url
+
 
 class Competition(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +59,13 @@ class Competition(db.Model, TimestampMixin):
     time = db.Column(db.String(50))
     place = db.Column(db.String(70))
     teams = db.relationship('Team')
+
+
+user_following = db.Table(
+    'user_following', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('following_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
 
 
 class User(db.Model, TimestampMixin):
@@ -65,11 +79,10 @@ class User(db.Model, TimestampMixin):
     email = db.Column(db.String(191), nullable=False, default='')
     organization = db.Column(db.String(200), nullable=False, default='')
     owned_dust = db.Column(db.Integer, nullable=False, default=100, comment='<=20 character')
-    is_hacker = db.Column(db.Boolean, nullable=False, default=True, comment='False for investor/judge')
+    is_hacker = db.Column(db.Boolean, nullable=False, default=False, comment='True for hackathon attenders')
     votes = db.Column(db.Integer, nullable=False, default=0, comment='number to vote for judge')
-    is_captain = db.Column(db.Boolean, nullable=False, default=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    role = db.Column(db.SmallInteger, nullable=False, default=Role.EXTRA, comment='Role of hacker')
+    role = db.Column(db.String(20), nullable=False, default=Role.EXTRA, comment='Role of hacker')
     git_account = db.Column(db.String(191), nullable=False, default='')
     fb_account = db.Column(db.String(191), nullable=False, default='')
     github_link = db.Column(db.String(191), nullable=False, default='')
@@ -84,7 +97,23 @@ class User(db.Model, TimestampMixin):
     suggestions = db.relationship('Suggestion')
     bounty_rewards = db.relationship('BountyReward')
     # many-to-many
-    teams = db.relationship('Team', secondary=team_user_table)
+    teams = db.relationship('Team', secondary=team_user_table, back_populates='users')
+    cteam_id = db.Column(db.Integer, nullable=False, default=0, comment='Current team id')
+
+    following = db.relationship('User', secondary=user_following,
+                                primaryjoin=id==user_following.c.user_id,
+                                secondaryjoin=id==user_following.c.following_id,
+                                backref='followers')
+
+    def follow(self, other):
+        if other not in self.following:
+            self.following.append(other)
+            other.followers.append(self)
+
+    def unfollow(self, other):
+        if other in self.following:
+            self.following.remove(other)
+            other.followers.remove(self)
 
     @hybrid_property
     def password(self):
@@ -153,7 +182,55 @@ class BountyReward(db.Model, TimestampMixin):
 
 class Notification(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False, default='')
-    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    content = db.Column(db.TEXT, nullable=False, default='')
+    from_uid = db.Column(db.Integer, nullable=False, default=0)
+    to_uid = db.Column(db.Integer, nullable=False, default=0)
     type = db.Column(db.SmallInteger, nullable=False)
 
+
+class UploadRecord(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    mimetype = db.Column(db.String(200))
+    filename = db.Column(db.String(200))
+    url = db.Column(db.String(191))
+
+
+class CoinPrice(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    price = db.Column(db.Float)
+
+
+class CoinGithub(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    chain_name = db.Column(db.String(50))
+    commit_count = db.Column(db.Integer)
+    github_project_name = db.Column(db.String(100))
+    github_project_url = db.Column(db.String(200))
+
+
+class ContributeRecord(db.Model, TimestampMixin):
+    id = db.Column(db.Intcger, primary_key=True)
+    author_avatar = db.Column(db.String(191))
+    author_id = db.Column(db.Integer)
+    author_login = db.Column(db.String(50))
+    chain_name = db.Column(db.String(50))
+    commit = db.Column(db.Integer)
+    add = db.Column(db.Integer)
+    delete = db.Column(db.Integer)
+    github_project_name = db.Column(db.String(100))
+
+
+class Contributor(db.Model, TimestampMixin):
+    id = db.Column(db.Intcger, primary_key=True)
+    author_avatar = db.Column(db.String(191))
+    author_login = db.Column(db.String(50))
+    total_commit = db.Column(db.Integer)
+
+
+class WithdrawRecord(db.Model, TimestampMixin):
+    id = db.Column(db.Intcger, primary_key=True)
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    amount = db.Column(db.Integer)
+    after = db.Column(db.Integer)

@@ -13,5 +13,5 @@ current_user = LocalProxy(lambda: getattr(_request_ctx_stack.top, 'user', None))
 db = SQLAlchemy(model_class=ModelMixin)
 
 redis_store = FlaskRedis(decode_responses=True, decode_components=True)
-# oss = FlaskOSS()
+oss = FlaskOSS()
 oauth_client = OAuthApi()

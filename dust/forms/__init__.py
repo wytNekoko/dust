@@ -12,3 +12,10 @@ class JSONForm(Form):
             data = request.get_json()
         super().__init__(data=data)
 
+
+class FForm(Form):
+    class Meta:
+        locales = ['en']
+
+    def __init__(self):
+        super().__init__(request.form)

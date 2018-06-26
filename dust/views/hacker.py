@@ -50,6 +50,8 @@ class Hacker(MethodView):
         return jsonify({'name': u.username, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
 
 
+
+
 bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
 bp.add_url_rule('/owned-planets/<string:username>', view_func=OwnedPlanets.as_view('owned_planets'))
 bp.add_url_rule('/builded-planets/<string:username>', view_func=BuildedPlanets.as_view('builded_planets'))

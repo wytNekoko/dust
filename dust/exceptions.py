@@ -14,10 +14,13 @@ exceptions = [
     ('RegisterError', 1007, 'Can\'t get access to github correctly'),
     ('DuplicateGithubUser', 1008, 'This github account/username has been registered. Please login directly.'),
     ('RegisterFailError', 1009, 'This github account hasn\'t been registered correctly. Please register again.'),
+    ('NoTeam', 1010, 'Current user is not in a team.'),
+    ('FileRequired', 1011, 'No file in request'),
+    ('UnSupportFileType', 1012, 'Unsupported file type'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
-    ('NoDust', 1006, 'Not enough dusts you owned')
+    ('NoDust', 1006, 'Not enough gift you owned')
 ]
 
 
