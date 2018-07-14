@@ -228,6 +228,8 @@ class Contributor(db.Model, TimestampMixin):
     author_avatar = db.Column(db.String(191))
     author_login = db.Column(db.String(50))
     total_commit = db.Column(db.Integer)
+    score = db.Column(db.Float)
+    gift = db.Column(db.Integer)
 
 
 class WithdrawRecord(db.Model, TimestampMixin):

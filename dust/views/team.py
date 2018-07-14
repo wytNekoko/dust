@@ -87,7 +87,10 @@ class TeamList(MethodView):
 class Attender(MethodView):
     def get(self, role):
         us = User.query.filter_by(is_hacker=True, role=role)
-        return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan) for u in us])
+        if us:
+            return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan) for u in us])
+        else:
+            raise NoData()
 
 
 bp.add_url_rule('/manage', view_func=TeamView.as_view('team_manage'))

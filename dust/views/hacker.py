@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
-from ..models.user_planet import BuildRecord, Planet, User
+from ..models.user_planet import *
 from ..core import current_user
 from ..exceptions import FormValidationError, NoData
 
@@ -50,8 +50,19 @@ class Hacker(MethodView):
         return jsonify({'name': u.username, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
 
 
+class GithubContribute(MethodView):
+    def get(self):
+        gs = Contributor.query.order_by(Contributor.score.desc()).all()
+        ret = list()
+        for g in gs:
+            info = g.todict()
+            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).limit(2)
+            info['commit'] = [cc.todict() for cc in commit_info]
+            ret.append(info)
+        return jsonify(ret)
 
 
 bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
 bp.add_url_rule('/owned-planets/<string:username>', view_func=OwnedPlanets.as_view('owned_planets'))
 bp.add_url_rule('/builded-planets/<string:username>', view_func=BuildedPlanets.as_view('builded_planets'))
+bp.add_url_rule('/github-contribute', view_func=GithubContribute.as_view('github_contribute'))
