@@ -14,7 +14,8 @@ flask-wtf = "*"
 "oss2" = "*"
 gunicorn = "*"
 # flask-paginate = "*"
-flask_cors
+flask_cors = "*"
+flask-socketio = "*"
 
 [dev-packages]
 "flake8" = "*"
