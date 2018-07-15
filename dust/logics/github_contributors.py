@@ -8,7 +8,7 @@ def github_gift():
         github_commit = cr.commit / CoinGithub.query.filter_by(github_project_name=cr.github_project_name).commit_count
         coin = CoinPrice.query.filter_by(name=cr.chain_name)
         arr = CoinPrice.query.order_by(CoinPrice.price.desc())
-        coin_price_rank = arr.index_of(coin) + 1
+        coin_price_rank = arr.index(coin) + 1
         tmp = Contributor.query.filter_by(author_login=cr.author_login)
         if not tmp:
             author = Contributor(author_login=cr.author_login, author_avatar=cr.author_avatar, score=0)
