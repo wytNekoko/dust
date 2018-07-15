@@ -20,7 +20,7 @@ def create_app(config=None):
     oauth_client.init_app(app)
     CORS(app, supports_credentials=True)  # 设置参数
     #chat
-    socketIO.init_app(app)
+    socketIO.init_app(app=app)
     # oss.init_app(app)
 
     before_request(app)
