@@ -2,22 +2,24 @@ import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
 
-from .core import db, logger, redis_store, oauth_client #, oss
+from .core import db, logger, redis_store, oauth_client,socketIO #, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
-
+from flask_cors import CORS, cross_origin
 
 def create_app(config=None):
     if config is None:
         config = os.environ.get('DUST_CONFIG', 'dust.config.DevConfig')
     app = CustomFlask(__name__)
     app.config.from_object(config)
-
     db.init_app(app)
     Migrate(app, db)
     redis_store.init_app(app)
     oauth_client.init_app(app)
+    CORS(app, supports_credentials=True)  # 设置参数
+    #chat
+    socketIO.init_app(app)
     # oss.init_app(app)
 
     before_request(app)
@@ -42,7 +44,7 @@ def before_request(app):
             else:
                 raise APITokenError
         # 从请求中获取login_token
-        auth_token = request.headers.get('X-Auth-Token')
+        auth_token = request.cookies
         if not auth_token:
             logger.debug('no auth_token')
             raise LoginRequired
