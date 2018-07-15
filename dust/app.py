@@ -2,11 +2,12 @@ import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
 
-from .core import db, logger, redis_store, oauth_client,socketIO #, oss
+from .core import db, logger, redis_store, oauth_client, socketIO #, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
 from flask_cors import CORS, cross_origin
+
 
 def create_app(config=None):
     if config is None:
@@ -44,7 +45,8 @@ def before_request(app):
             else:
                 raise APITokenError
         # 从请求中获取login_token
-        auth_token = request.cookies
+        auth_token = request.headers.get('X-Auth-Token')
+        #auth_token = request.cookies
         if not auth_token:
             logger.debug('no auth_token')
             raise LoginRequired
@@ -77,3 +79,4 @@ def configure_error_handles(app):
     @app.errorhandler(405)
     def http_exception_handler(e):
         return jsonify(errcode=e.code, errmsg=e.name), e.code
+
