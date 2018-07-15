@@ -4,6 +4,7 @@ venv/
 *iml
 *xml
 __pycache__/
+Pipfile.*
 
 # test
 test*
