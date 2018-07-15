@@ -22,7 +22,7 @@ class FeedbackView(MethodView):
 
 class GetNotificationView(MethodView):
     def get(self, uid):
-        ns = Notification.query.filter_by(uid=uid).order_by(Notification.created_at.desc()).all()
+        ns = Notification.query.filter_by(to_uid=uid).order_by(Notification.created_at.desc()).all()
         ret = list()
         for n in ns:
             x = n.todict()
