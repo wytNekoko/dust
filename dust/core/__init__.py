@@ -3,6 +3,7 @@ from werkzeug.local import LocalProxy
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_redis import FlaskRedis
+from flask_socketio import SocketIO
 from ..helpers import ModelMixin
 from .flask_oss import FlaskOSS
 from .oauth import OAuthApi
@@ -15,3 +16,4 @@ db = SQLAlchemy(model_class=ModelMixin)
 redis_store = FlaskRedis(decode_responses=True, decode_components=True)
 oss = FlaskOSS()
 oauth_client = OAuthApi()
+socketIO = SocketIO()
