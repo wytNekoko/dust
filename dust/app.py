@@ -1,12 +1,15 @@
 import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 
 from .core import db, logger, redis_store, oauth_client,socketIO #, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
 from flask_cors import CORS, cross_origin
+async_mode = None
+socketio = SocketIO(async_mode=async_mode)
 
 def create_app(config=None):
     if config is None:
@@ -19,9 +22,8 @@ def create_app(config=None):
     oauth_client.init_app(app)
     CORS(app, supports_credentials=True)  # 设置参数
     #chat
-    socketIO.init_app(app)
+    socketio.init_app(app)
     # oss.init_app(app)
-
     before_request(app)
     register_blueprints(app, __name__.split('.', 1)[0] + '.views')
     configure_error_handles(app)

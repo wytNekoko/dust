@@ -12,6 +12,7 @@ from ..constants import Notify, NotifyContent
 bp = Blueprint('login', __name__)
 
 
+
 class LoginView(MethodView):
     def post(self):
         data = request.get_json() or {}
@@ -43,12 +44,14 @@ class LoginView(MethodView):
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())
 
 
+
 class LogoutView(MethodView):
     def get(self):
         auth_token = request.headers.get('X-Auth-Token')
         if auth_token:
             redis_store.delete(auth_token)
         raise NoError
+
 
 
 class LoginAuthGithub(MethodView):
