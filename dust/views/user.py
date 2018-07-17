@@ -170,3 +170,5 @@ bp.add_url_rule('/up-project', view_func=UploadProject.as_view('upload_project')
 bp.add_url_rule('/set-project', view_func=SetProject.as_view('set_project'))
 bp.add_url_rule('/upload-info', view_func=UploadInfo.as_view('upload_info'))
 bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))
+
+
