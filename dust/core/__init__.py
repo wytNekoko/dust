@@ -16,6 +16,7 @@ redis_store = FlaskRedis(decode_responses=True, decode_components=True)
 oss = FlaskOSS()
 oauth_client = OAuthApi()
 #chat
-socketIO = SocketIO()
+async_mode=None
+socketIO = SocketIO(async_mode=async_mode)
 
 
