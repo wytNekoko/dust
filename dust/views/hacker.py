@@ -51,8 +51,11 @@ class Hacker(MethodView):
 
 
 class GithubContribute(MethodView):
-    def get(self):
-        gs = Contributor.query.order_by(Contributor.score.desc()).all()
+    def post(self):
+        req_data = request.get_json()
+        page = req_data.get('page')
+        per_page = req_data.get('per_page')
+        gs = Contributor.query.order_by(Contributor.score.desc()).paginate(page, per_page=per_page, error_out=False)
         ret = list()
         for g in gs:
             info = g.todict()

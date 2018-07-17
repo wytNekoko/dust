@@ -55,6 +55,22 @@ class RegisterAuthGithub(MethodView):
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=u.todict())
 
 
+class ClaimGithub(MethodView):
+    def post(self):
+        code = request.get_json().get('code')
+        author_login = request.get_json().get('author_login')
+        resp = oauth_client.get_token(code)
+        access_token = resp.json().get('access_token')
+        if not access_token:
+            raise RegisterError()
+        oauth_client.set_token(access_token)
+        user_info = oauth_client.user().json()
+        u1 = User.get_by_username(user_info.get('login'))
+        if u1:
+            raise DuplicateGithubUser()
+        pass
+
+
 class RegisterKCash(MethodView):
     def post(self):
         code = request.get_json().get('code')
@@ -98,3 +114,4 @@ class RegisterKCash(MethodView):
 bp.add_url_rule('/register', view_func=RegisterView.as_view('user_register'))
 bp.add_url_rule('/register/github', view_func=RegisterAuthGithub.as_view('register_github'))
 bp.add_url_rule('/register/kcash', view_func=RegisterKCash.as_view('register_kcash'))
+bp.add_url_rule('/register/claim', view_func=ClaimGithub.as_view('claim_github'))

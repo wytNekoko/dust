@@ -72,7 +72,7 @@ class AttenderForm(FForm):
         else:
             raise LoginRequired()
         u.avatar = get_file('file')
-        u.realname = self.name.data
+        u.hacker_name = self.name.data
         u.city = self.city.data
         u.role = self.role.data
         u.organization = self.org.data
