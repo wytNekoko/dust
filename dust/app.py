@@ -18,10 +18,10 @@ def create_app(config=None):
     Migrate(app, db)
     redis_store.init_app(app)
     oauth_client.init_app(app)
-    CORS(app, supports_credentials=True)  # 设置参数
-    #chat
-    socketIO.init_app(app=app)
     oss.init_app(app)
+    # CORS(app, supports_credentials=True)  # 设置参数
+    #chat
+    # socketIO.init_app(app=app)
 
     before_request(app)
     register_blueprints(app, __name__.split('.', 1)[0] + '.views')
