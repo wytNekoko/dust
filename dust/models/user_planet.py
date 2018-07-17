@@ -203,6 +203,12 @@ class CoinPrice(db.Model, TimestampMixin):
     price = db.Column(db.Float)
 
 
+class CoinRank(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    rank = db.Column(db.Integer)
+
+
 class CoinGithub(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     chain_name = db.Column(db.String(50))

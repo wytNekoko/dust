@@ -1,6 +1,7 @@
 from dust import create_app
 from dust.logics.liquidation import *
 from dust.logics.cal_builders_num import cal_builders
+from dust.logics.github_contributors import *
 
 
 def monthly_liquidate():
@@ -16,6 +17,14 @@ def get_builders_num():
         cal_builders()
 
 
+def github_plan():
+    app = create_app()
+    with app.app_context():
+        get_rank()
+        github_score()
+        cal_gift()
+
+
 if __name__ == '__main__':
-    get_builders_num()
+    github_plan()
 
