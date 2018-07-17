@@ -27,12 +27,12 @@ def github_score():
         tmp = Contributor.query.filter_by(author_login=cr.author_login).first()
         if not tmp:
             author = Contributor(author_login=cr.author_login, author_avatar=cr.author_avatar, score=0)
-            author.score += (1/coin_price_rank) * github_commit * 100000000
-            author.total_commit += cr.commit
             db.session.add(author)
+            author.score = (1/coin_price_rank) * github_commit * 100000000
+            author.total_commit = cr.commit
         else:
-            tmp.score = (1/coin_price_rank) * github_commit * 100000000
-            tmp.total_commit = cr.commit
+            tmp.score += (1/coin_price_rank) * github_commit * 100000000
+            tmp.total_commit += cr.commit
         db.session.flush()
     db.session.commit()
 
