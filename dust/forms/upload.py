@@ -51,7 +51,7 @@ def get_file(name):
 
 def get_files():
     files_ = request.files
-    urls = [file_url(f) for f in files_]
+    urls = [file_url(f.mimetype, f) for f in files_]
     return urls
 
 
@@ -72,9 +72,6 @@ class AttenderForm(FForm):
         else:
             raise LoginRequired()
         u.avatar = get_file('file')
-        print(u.avatar)
-        print(self.name.data)
-        print(self.city.data)
         u.hacker_name = self.name.data
         u.city = self.city.data
         u.role = self.role.data
