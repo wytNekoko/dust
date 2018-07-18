@@ -38,7 +38,7 @@ def github_score():
 
 
 def cal_gift():
-    TOTAL_GIFT = 8000000
+    TOTAL_GIFT = 7000000 / 7
     section = [0.01, 0.05, 0.15, 0.3, 0.5, 0.75, 1]
     gift_portion = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15, 0.1]
     contributors = Contributor.query.order_by(Contributor.score.desc()).all()

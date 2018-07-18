@@ -65,7 +65,7 @@ class GithubContribute(MethodView):
         }
         for index, g in enumerate(gs.items):
             info = g.todict()
-            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).limit(2)
+            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).order_by(ContributeRecord.commit.desc()).limit(2)
             info['rank'] = index + 1
             info['commit'] = [cc.todict() for cc in commit_info]
             res['items'].append(info)
