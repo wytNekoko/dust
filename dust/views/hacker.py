@@ -56,13 +56,20 @@ class GithubContribute(MethodView):
         page = req_data.get('page')
         per_page = req_data.get('per_page')
         gs = Contributor.query.order_by(Contributor.score.desc()).paginate(page, per_page=per_page, error_out=False)
-        ret = list()
-        for g in gs:
+        res = {
+            'items': [],
+            'page': page if page else 1,
+            'pages': 1 if gs.total / per_page <= 1 else int(gs.total / per_page) + 1,
+            'total': gs.total,
+            'per_page': per_page
+        }
+        for index, g in enumerate(gs.items):
             info = g.todict()
             commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).limit(2)
+            info['rank'] = index + 1
             info['commit'] = [cc.todict() for cc in commit_info]
-            ret.append(info)
-        return jsonify(ret)
+            res['items'].append(info)
+        return jsonify(res)
 
 
 bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
