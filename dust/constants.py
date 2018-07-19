@@ -37,6 +37,14 @@ class Role:
     DAPPS = 'DApps'
     SECURITY = 'Security'
     PUBLIC_CHAIN = 'Public Chain'
+    FRONTEND = 'Frontend'
+    BACKEND = 'Backend'
+    UI = 'UI'
+    PRODUCT = 'Product'
+    OTHERS = 'Others'
+
+
+
 
 
 
