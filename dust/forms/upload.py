@@ -113,3 +113,26 @@ class ProjectForm(FForm):
         db.session.add(p)
         db.session.flush()
         return self.set(p.id)
+
+
+class ProfileForm(FForm):
+    city = StringField('city', [DataRequired(), Length(max=500, min=1)])
+    email = StringField('email', [DataRequired()])
+    gift = StringField('gift', [DataRequired(), Length(min=1)])
+    eth = StringField('eth', [DataRequired(), Length(min=5)])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        if current_user:
+            u = current_user
+        else:
+            raise LoginRequired()
+        u.avatar = get_file('file')
+        u.city = self.city.data
+        u.email = self.email.data
+        u.gift = self.gift.data
+        u.eth = self.eth.data
+        db.session.commit()
+        return u

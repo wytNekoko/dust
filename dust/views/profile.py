@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
-
+from ..forms.upload import *
 from ..core import current_user, db, oauth_client
 from ..exceptions import FormValidationError, NoData, EmptyUserInfo, LoginAuthError
 
@@ -32,5 +32,16 @@ class BindGit(MethodView):
         return jsonify()
 
 
+class EditProfile(MethodView):
+    def post(self):
+        form = ProfileForm()
+        if form.validate():
+            u = form.save()
+            return u.todict()
+        else:
+            raise FormValidationError(form)
+
+
 bp.add_url_rule('/main', view_func=MainProfile.as_view('main_profile'))
 bp.add_url_rule('/bind-github', view_func=BindGit.as_view('bind_github'))
+bp.add_url_rule('edit', view_func=EditProfile.as_view('edit_profile'))
