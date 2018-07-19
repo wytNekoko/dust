@@ -60,12 +60,18 @@ class LoginAuthGithub(MethodView):
             raise LoginAuthError()
         oauth_client.set_token(access_token)
         user_info = oauth_client.user().json()
-        user = User.get_by_username(user_info.get('login'))
-        if not user:
-            raise RegisterFailError()
+        u = User.get_by_username(user_info.get('login'))
+        if not u:
+            u = User(username=user_info.get('login'))
+            u.git_account = user_info.get('login')
+            u.github_link = user_info.get('html_url')
+            u.avatar = user_info.get('avatar_url')
+            db.session.add(u)
+            db.session.flush()
+            # raise RegisterFailError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
-            id=user.id,
+            id=u.id,
             created_at=datetime.now(),
         ))
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day

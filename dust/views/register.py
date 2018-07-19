@@ -38,6 +38,7 @@ class RegisterAuthGithub(MethodView):
         u = User(username=user_info.get('login'))
         u.git_account = user_info.get('login')
         u.github_link = user_info.get('html_url')
+        u.avatar = user_info.get('avatar_url')
         db.session.add(u)
         db.session.flush()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
