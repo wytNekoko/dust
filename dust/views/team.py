@@ -88,7 +88,7 @@ class Attender(MethodView):
     def get(self, role):
         us = User.query.filter_by(is_hacker=True, role=role)
         if us:
-            return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan) for u in us])
+            return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan, uid=u.id) for u in us])
         else:
             raise NoData()
 
