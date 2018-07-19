@@ -61,7 +61,7 @@ class LoginAuthGithub(MethodView):
         oauth_client.set_token(access_token)
         user_info = oauth_client.user().json()
         u1 = User.get_by_username(user_info.get('login'))
-        u2 = User.query.filter_by(git_acount=user_info.get('login')).first()
+        u2 = User.query.filter_by(git_account=user_info.get('login')).first()
         if not u1 and not u2:
             u = User(username=user_info.get('login'))
             u.git_account = user_info.get('login')
