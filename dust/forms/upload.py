@@ -78,7 +78,8 @@ class AttenderForm(FForm):
         u.role = self.role.data
         u.organization = self.org.data
         u.eth = self.eth.data
-        u.slogan = self.slogan.data
+        if self.slogan.data:
+            u.slogan = self.slogan.data
         u.is_hacker = True
         db.session.commit()
         return u
