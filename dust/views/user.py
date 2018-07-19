@@ -159,9 +159,13 @@ class CheckTeam(MethodView):
             ret['isLeader'] = False
         return ret
 
+
 class LikeTrue(MethodView):
     def get(self):
-        pass
+        true = Activity.get(1)
+        true.like += 1
+        return jsonify(true.like)
+
 
 register_api(bp, FollowView, 'follow', '/follow')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
@@ -173,3 +177,4 @@ bp.add_url_rule('/up-project', view_func=UploadProject.as_view('upload_project')
 bp.add_url_rule('/set-project', view_func=SetProject.as_view('set_project'))
 bp.add_url_rule('/upload-info', view_func=UploadInfo.as_view('upload_info'))
 bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))
+bp.add_url_rule('/true', view_func=LikeTrue.as_view('like_true'))
