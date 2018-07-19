@@ -71,7 +71,9 @@ class AttenderForm(FForm):
             u = current_user
         else:
             raise LoginRequired()
-        u.avatar = get_file('file')
+        a = get_file('file')
+        if a:
+            u.avatar = a
         logger.debug('avatar url: '+u.avatar)
         u.hacker_name = self.name.data
         u.city = self.city.data
