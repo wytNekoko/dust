@@ -11,7 +11,7 @@ class MainProfile(MethodView):
     def get(self):
         if not current_user:
             raise EmptyUserInfo()
-        ret = current_user.to_dict()
+        ret = current_user.todict()
         # ps = current_user.owned_planets
         # ret['planets'] = [{'created_at': p.created_at, 'name': p.name, 'reward': p.reward} for p in ps]
         return jsonify(ret)
