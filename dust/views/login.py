@@ -60,14 +60,21 @@ class LoginAuthGithub(MethodView):
             raise LoginAuthError()
         oauth_client.set_token(access_token)
         user_info = oauth_client.user().json()
-        u = User.get_by_username(user_info.get('login'))
-        if not u:
+        u1 = User.get_by_username(user_info.get('login'))
+        u2 = User.query.filter_by(git_acount=user_info.get('login')).first()
+        if not u1 and not u2:
             u = User(username=user_info.get('login'))
             u.git_account = user_info.get('login')
             u.github_link = user_info.get('html_url')
             u.avatar = user_info.get('avatar_url')
             db.session.add(u)
             db.session.flush()
+        elif u1 and not u2:
+            u = u1
+        elif u2 and not u1:
+            u = u2
+        elif u1 == u2:
+            u = u1
             # raise RegisterFailError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(

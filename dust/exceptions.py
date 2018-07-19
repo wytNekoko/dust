@@ -17,6 +17,7 @@ exceptions = [
     ('NoTeam', 1010, 'Current user is not in a team.'),
     ('FileRequired', 1011, 'No file in request'),
     ('UnSupportFileType', 1012, 'Unsupported file type'),
+    ('EmptyUserInfo', 1013, 'Current user is Nonetype'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
