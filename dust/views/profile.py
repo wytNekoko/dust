@@ -12,8 +12,6 @@ class MainProfile(MethodView):
         if not current_user:
             raise EmptyUserInfo()
         ret = current_user.to_dict()
-        ret['total_gift'] = current_user.owned_dust
-        ret['github_link'] = current_user.github_link
         # ps = current_user.owned_planets
         # ret['planets'] = [{'created_at': p.created_at, 'name': p.name, 'reward': p.reward} for p in ps]
         return jsonify(ret)
@@ -35,3 +33,4 @@ class BindGit(MethodView):
 
 
 bp.add_url_rule('/main', view_func=MainProfile.as_view('main_profile'))
+bp.add_url_rule('/bind-github', view_func=BindGit.as_view('bind_github'))

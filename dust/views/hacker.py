@@ -45,9 +45,16 @@ class PostedRewards(MethodView):
 
 
 class Hacker(MethodView):
-    def get(self, username):
-        u = User.get_by_username(username)
-        return jsonify({'name': u.username, 'property': u.owned_dust, 'projects': len(u.owned_planets)})
+    def post(self):
+        hackername = request.get_json().get('name')
+        cid = request.get_json().get('cid')
+        if hackername:
+            c = Contributor.query.filter_by(author_login=hackername)
+        if cid:
+            c = Contributor.query.get(cid)
+        ret = c.todict()
+        ret['commit_info'] = commit_info = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
+        return ret
 
 
 class GithubContribute(MethodView):
@@ -72,7 +79,7 @@ class GithubContribute(MethodView):
         return jsonify(res)
 
 
-bp.add_url_rule('/<string:username>', view_func=Hacker.as_view('personal'))
+bp.add_url_rule('/someone', view_func=Hacker.as_view('one_hacker'))
 bp.add_url_rule('/owned-planets/<string:username>', view_func=OwnedPlanets.as_view('owned_planets'))
 bp.add_url_rule('/builded-planets/<string:username>', view_func=BuildedPlanets.as_view('builded_planets'))
 bp.add_url_rule('/github-contribute', view_func=GithubContribute.as_view('github_contribute'))
