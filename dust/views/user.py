@@ -159,6 +159,9 @@ class CheckTeam(MethodView):
             ret['isLeader'] = False
         return ret
 
+class LikeTrue(MethodView):
+    def get(self):
+        pass
 
 register_api(bp, FollowView, 'follow', '/follow')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))

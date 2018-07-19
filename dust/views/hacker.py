@@ -49,9 +49,11 @@ class Hacker(MethodView):
         hackername = request.get_json().get('name')
         cid = request.get_json().get('cid')
         if hackername:
-            c = Contributor.query.filter_by(author_login=hackername)
+            c = Contributor.query.filter_by(author_login=hackername).first()
         if cid:
             c = Contributor.query.get(cid)
+        if not c:
+            raise NoData()
         ret = c.todict()
         ret['commit_info'] = commit_info = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
         return ret

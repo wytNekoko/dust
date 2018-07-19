@@ -7,6 +7,12 @@ from . import TimestampMixin
 from ..constants import *
 
 
+class Activity(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, default='')
+    like = db.Column(db.Integer, nullable=False, default=0)
+
+
 team_user_table = db.Table(
     'teammates', db.Model.metadata,
     db.Column('team_id', db.Integer, db.ForeignKey('team.id')),

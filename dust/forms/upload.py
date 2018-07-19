@@ -4,7 +4,7 @@ from flask import request
 
 from . import FForm
 from ..core.flask_oss import gen_filename
-from ..core import current_user, db, redis_store, oss
+from ..core import current_user, db, redis_store, oss, logger
 from ..models.user_planet import *
 from ..constants import Role
 from ..exceptions import LoginRequired, FileRequired, UnSupportFileType
@@ -72,6 +72,7 @@ class AttenderForm(FForm):
         else:
             raise LoginRequired()
         u.avatar = get_file('file')
+        logger.debug('avatar url: '+u.avatar)
         u.hacker_name = self.name.data
         u.city = self.city.data
         u.role = self.role.data
