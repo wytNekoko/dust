@@ -92,7 +92,7 @@ class LoginAuthGithub(MethodView):
         #     n.content = NotifyContent.get(Notify.BUILD).format('3')
         # db.session.commit()
 
-        return dict(auth_token=auth_token, expires_in=expires_in, user_info=user.todict())
+        return dict(auth_token=auth_token, expires_in=expires_in, user_info=u.todict())
 
 
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
