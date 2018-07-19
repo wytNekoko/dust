@@ -233,7 +233,6 @@ class ContributeRecord(db.Model, TimestampMixin):
     add = db.Column(db.Integer)
     delete = db.Column(db.Integer)
     github_project_name = db.Column(db.String(100))
-    address = db.Column(db.String(50))
 
 
 class Contributor(db.Model, TimestampMixin):
