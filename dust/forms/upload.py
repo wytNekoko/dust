@@ -104,12 +104,17 @@ class ProjectForm(FForm):
         logo_url = get_file('logo')
         item.logo = logo_url
         item.intro = self.desc.data
+        logger.debug('project demo: ', self.demo.data)
         if self.demo.data:
             item.demo = self.demo.data
+            logger.debug('project demo: ', self.demo.data)
         else:
             urls = get_files()
             for url in urls:
-                item.photos.append(DemoPhoto(url=url, project_id=pid))
+                logger.debug('project photo url:', url)
+                d = DemoPhoto(url=url, project_id=pid)
+                db.session.add(d)
+                item.photos.append(d)
         db.session.add(item)
         db.session.commit()
         return item
@@ -120,7 +125,7 @@ class ProjectForm(FForm):
         for usr in t.users:
             usr.owned_dust += 100
         db.session.add(p)
-        db.session.commit()
+        db.session.flush()
         return self.set(p.id)
 
 
