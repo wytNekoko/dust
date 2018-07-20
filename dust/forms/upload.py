@@ -109,9 +109,9 @@ class ProjectForm(FForm):
         if self.demo.data:
             item.demo = self.demo.data
             logger.debug('project demo: ', self.demo.data)
-        else:
-            logger.debug('request.files', request.files)
-            logger.debug('request.files', request.files.keys())
+        # else:
+        #     logger.debug('request.files', request.files)
+        #     logger.debug('request.files', request.files.keys())
         # urls = get_files()
         # for url in urls:
         #     logger.debug('project photo url: %s', url)
