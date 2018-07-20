@@ -168,8 +168,8 @@ class TeamView(MethodView):
         t = Team(name=n, captain_id=current_user.id, competition_id=1)
         db.session.add(t)
         db.session.flush()
-        u = User.query.get(current_user.id)
-        u.cteam_id = t.id
+        t.users.append(current_user)
+        current_user.cteam_id = t.id
         db.session.commit()
         return t.todict()
 
