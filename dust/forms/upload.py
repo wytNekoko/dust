@@ -51,6 +51,7 @@ def get_file(name):
 
 def get_files():
     files_ = request.files
+    logger.debug('project files: ', files_)
     urls = [file_url(f.mimetype, f) for f in files_]
     return urls
 
@@ -103,8 +104,13 @@ class ProjectForm(FForm):
         item.name = self.name.data
         item.logo = get_file('logo')
         item.intro = self.desc.data
-        item.photos = [DemoPhoto(url=x) for x in get_files()]
-
+        if self.demo.data:
+            item.demo = self.demo.data
+        else:
+            urls = get_files()
+            for index, url in enumerate(urls):
+                if index < len(urls) - 1:
+                    item.photos.append(DemoPhoto(url=url))
         db.session.add(item)
         db.session.commit()
         return item
