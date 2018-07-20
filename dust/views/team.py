@@ -11,6 +11,8 @@ bp = Blueprint('team', __name__, url_prefix='/team')
 class TeamView(MethodView):
     def post(self):
         n = request.get_json().get('name')
+        if not current_user:
+            raise NoData()
         t = Team(name=n, captain_id=current_user.id)
         db.session.add(t)
         db.session.flush()
