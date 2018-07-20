@@ -8,7 +8,7 @@ from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..forms.bounty import *
 from ..forms.upload import *
 from ..core import current_user, db, redis_store
-from ..exceptions import FormValidationError, NoData, NoDust
+from ..exceptions import FormValidationError, NoData, NoDust, NoTeam
 from ..constants import Notify, NotifyContent
 from ..helpers import register_api
 
@@ -160,6 +160,58 @@ class CheckTeam(MethodView):
         return ret
 
 
+class TeamView(MethodView):
+    def post(self):
+        n = request.get_json().get('name')
+        if not current_user:
+            raise NoData()
+        t = Team(name=n, captain_id=current_user.id)
+        db.session.add(t)
+        db.session.flush()
+        u = User.query.get(current_user.id)
+        u.cteam_id = t.id
+        db.session.commit()
+        return t
+
+    def put(self):
+        if current_user.cteam_id == 0:
+            raise NoTeam()
+        item = Team.query.get(current_user.cteam_id)
+        item.is_completed = True
+        db.session.commit()
+        return jsonify('team completed')
+
+    def delete(self):
+        item = Team.query.get(current_user.cteam_id)
+        item.delete()
+        return jsonify('team dismiss')
+
+
+class AddMember(MethodView):
+    def post(self):
+        n = request.get_json().get('member_id')
+        if current_user.cteam_id == 0:
+            raise NoTeam()
+        if not n:
+            raise NoData()
+        t = Team.query.get(current_user.cteam_id)
+        u = User.query.get(n)
+        u.cteam_id = t.id
+        t.users.append(u)
+        db.session.commit()
+        return t.todict()
+
+
+class LeaveTeam(MethodView):
+    def post(self):
+        if current_user.cteam_id == 0:
+            raise NoTeam()
+        t = Team.query.get(current_user.cteam_id)
+        t.users.remove(current_user)
+        db.session.commit()
+        return t.users
+
+
 class LikeTrue(MethodView):
     def get(self):
         true = Activity.get(1)
@@ -178,3 +230,6 @@ bp.add_url_rule('/set-project', view_func=SetProject.as_view('set_project'))
 bp.add_url_rule('/upload-info', view_func=UploadInfo.as_view('upload_info'))
 bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))
 bp.add_url_rule('/true', view_func=LikeTrue.as_view('like_true'))
+bp.add_url_rule('/manage', view_func=TeamView.as_view('team_manage'))
+bp.add_url_rule('/add-member', view_func=AddMember.as_view('team_add_member'))
+bp.add_url_rule('/leave', view_func=LeaveTeam.as_view('team_leave'))
