@@ -68,7 +68,7 @@ class LoginAuthGithub(MethodView):
             u.github_link = user_info.get('html_url')
             u.avatar = user_info.get('avatar_url')
             db.session.add(u)
-            db.session.commit()
+            db.session.flush()
         elif u1 and not u2:
             u = u1
         elif u2 and not u1:
@@ -81,6 +81,7 @@ class LoginAuthGithub(MethodView):
             id=u.id,
             created_at=datetime.now(),
         ))
+        db.session.commit()
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
 
