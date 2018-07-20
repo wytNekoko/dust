@@ -82,7 +82,6 @@ class User(db.Model, TimestampMixin):
     is_hacker = db.Column(db.Boolean, nullable=False, default=False, comment='True for hackathon attenders')
     votes = db.Column(db.Integer, nullable=False, default=0, comment='number to vote for judge')
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
-    is_completed = db.Column(db.Boolean, nullable=False, default=False)
     role = db.Column(db.String(20), nullable=False, default=Role.EXTRA, comment='Role of hacker')
     git_account = db.Column(db.String(191), nullable=False, default='')
     fb_account = db.Column(db.String(191), nullable=False, default='')
@@ -256,8 +255,9 @@ class MsgList(db.Model, TimestampMixin):
     read = db.Column(db.Integer)
     from_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    istalk = db.Column(db.Integer)
     isgroup = db.Column(db.Integer)
-
+    created_at = db.Column(db.Date)
 
 
 
