@@ -117,8 +117,12 @@ class UploadProject(MethodView):
     def post(self):
         form = ProjectForm()
         if form.validate():
-            p = form.create()
-            return p.todict()
+            p = Project.query.filter_by(name=form.name.data).first()
+            if p:
+                res = form.set(p.id)
+            else:
+                res = form.create()
+            return res.todict()
         else:
             raise FormValidationError(form)
 

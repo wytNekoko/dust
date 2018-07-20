@@ -51,8 +51,7 @@ def get_file(name):
 
 def get_files():
     files_ = request.files
-    logger.debug('project files: ', files_)
-    urls = [file_url(f.mimetype, f) for f in files_]
+    urls = [file_url(files_[f].mimetype, files_[f]) for f in files_.keys()]
     return urls
 
 

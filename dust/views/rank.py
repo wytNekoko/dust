@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 from sqlalchemy import desc
-from ..models.user_planet import Planet, User, BountyReward
+from ..models.user_planet import *
 from ..models.monthly_focus import TopOwners, TopBuilders, TopPlanets
 
 bp = Blueprint('rank', __name__, url_prefix='/rank')
@@ -50,7 +50,31 @@ class HackerView(MethodView):
         return jsonify(ret)
 
 
+class ProjectView(MethodView):
+    def post(self):
+        req_data = request.get_json()
+        page = req_data.get('page')
+        per_page = req_data.get('per_page')
+        ts = Team.query.filter_by(is_active=True).order_by(Team.ballot.desc()).paginate(page, per_page=per_page, error_out=False)
+        res = {
+            'items': [],
+            'page': page if page else 1,
+            'pages': 1 if ts.total / per_page <= 1 else int(ts.total / per_page) + 1,
+            'total': ts.total,
+            'per_page': per_page
+        }
+        for t in ts:
+            p = Project.query.filter_by(team_id=t.id).first()
+            if p:
+                info = p.todict()
+                info['team'] = t.todict()
+                info['received'] = True
+                res['items'].append(info)
+        return jsonify(res)
+
+
 bp.add_url_rule('/dashboard', view_func=DashboardView.as_view('rank_dashboard'))
 bp.add_url_rule('/winners', view_func=WinnerView.as_view('rank_winners'))
 bp.add_url_rule('/bounty', view_func=BountyView.as_view('rank_bounty'))
 bp.add_url_rule('/hacker', view_func=HackerView.as_view('rank_hackers'))
+bp.add_url_rule('/project', view_func=ProjectView.as_view('rank_projects'))

@@ -36,6 +36,7 @@ class Team(db.Model, TimestampMixin):
     votes = db.Column(db.SmallInteger, nullable=False, default=3, comment='number to vote')
     ballot = db.Column(db.SmallInteger, nullable=False, default=0, comment='received number')
     judges = db.Column(db.SmallInteger, nullable=False, default=0, comment='votes from judges')
+    bonus = db.Column(db.Integer, nullable=False, default=0)
 
 
 class Project(db.Model, TimestampMixin):
