@@ -58,6 +58,12 @@ class DemoPhoto(db.Model, TimestampMixin):
         return self.url
 
 
+class VoteRecord(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    from_tid = db.Column(db.Integer)
+    to_tid = db.Column(db.Integer)
+
+
 class Competition(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, default='')

@@ -157,6 +157,8 @@ class CheckTeam(MethodView):
             ret['isLeader'] = True
         else:
             ret['isLeader'] = False
+        ret['team_info'] = tt.todict()
+        ret['team_member'] = [dict(username=u.username, name=u.hacker_name, role=u.role, avatar=u.avatar, uid=u.id) for u in tt.users]
         return ret
 
 
