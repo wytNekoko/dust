@@ -105,14 +105,16 @@ class ProjectForm(FForm):
         logo_url = get_file('logo')
         item.logo = logo_url
         item.description = self.desc.data
-        logger.debug('project demo: ', self.demo.data)
-        # if self.demo.data:
-        #     item.demo = self.demo.data
-        #     logger.debug('project demo: ', self.demo.data)
-        # else:
-        urls = get_files()
-        for url in urls:
-            logger.debug('project photo url:', url)
+        logger.debug('project demo: %s', self.demo.data)
+        if self.demo.data:
+            item.demo = self.demo.data
+            logger.debug('project demo: ', self.demo.data)
+        else:
+            logger.debug('request.files', request.files)
+            logger.debug('request.files', request.files.keys())
+        # urls = get_files()
+        # for url in urls:
+        #     logger.debug('project photo url: %s', url)
         #         d = DemoPhoto(url=url, project_id=pid)
         #         db.session.add(d)
         #         item.photos.append(d)
