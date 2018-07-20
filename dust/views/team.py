@@ -36,8 +36,7 @@ class TeamList(MethodView):
 
 class Attender(MethodView):
     def get(self, role):
-        us = User.query.filter_by(role=role)
-
+        us = User.query.filter_by(role=role, is_hacker=True)
         if us:
             return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan, uid=u.id, team_id=u.cteam_id) for u in us])
         else:
