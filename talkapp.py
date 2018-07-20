@@ -141,7 +141,7 @@ def send_message(message):
 
 @socketio.on('add_group', namespace='/websocket/user_refresh')
 def send_message(message):
-
+    print(message)
     from_id = message['from_id']
     to_id = message['to_id']
     us = User.query.get(to_id)
@@ -185,16 +185,17 @@ def send_message(message):
     print(message,result)
     #保存确认
     msgLIst = MsgList()
-    msgLIst.from_id = to_id
-    msgLIst.istalk = 1
+
+    msgLIst.from_id = from_id
+    msgLIst.to_id = to_id
     msgLIst.msg = demjson.encode(result)
 
 
 
     #保存返回说明
     msgLIst1 = MsgList()
-    msgLIst1.from_id = from_id
-    msgLIst1.istalk = None
+    msgLIst1.from_id = to_id
+    msgLIst1.to_id = from_id
     msgLIst1.msg = demjson.encode(result1)
 
 
@@ -401,6 +402,7 @@ def exit_group(message):
     result['isgroup'] = 0
 
     if(user.cteam_id!=0):
+
 
         if user.is_admin ==0:
             user.cteam_id=0
