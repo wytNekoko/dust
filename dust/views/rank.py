@@ -63,7 +63,7 @@ class ProjectView(MethodView):
             'total': ts.total,
             'per_page': per_page
         }
-        for t in ts:
+        for t in ts.items:
             p = Project.query.filter_by(team_id=t.id).first()
             if p:
                 info = p.todict()
