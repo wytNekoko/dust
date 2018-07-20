@@ -22,8 +22,7 @@ conns = {}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-async_mode = 'eventlet'
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app)
 db.init_app(app)
 config = os.environ.get('DUST_CONFIG', 'dust.config.DevConfig')
 app.config.from_object(config)

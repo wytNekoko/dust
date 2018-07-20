@@ -28,7 +28,7 @@ class TeamList(MethodView):
             ts = Team.query.filter_by(is_completed=True)
         res = list()
         for t in ts:
-            members = [dict(username=u.username, role=u.role, avatar=u.avatar)for u in t.users]
+            members = [dict(username=u.username, name=u.hacker_name, role=u.role, avatar=u.avatar, uid=u.id) for u in t.users]
             tmp = dict(name=t.name, tid=t.id, members=members)
             res.append(tmp)
         return jsonify(res)
