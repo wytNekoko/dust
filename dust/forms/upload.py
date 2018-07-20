@@ -109,7 +109,7 @@ class ProjectForm(FForm):
             urls = get_files()
             for index, url in enumerate(urls):
                 if index < len(urls) - 1:
-                    item.photos.append(DemoPhoto(url=url))
+                    item.photos.append(DemoPhoto(url=url, project_id=pid))
         db.session.add(item)
         db.session.commit()
         return item

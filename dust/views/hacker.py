@@ -48,15 +48,15 @@ class Hacker(MethodView):
     def post(self):
         hackername = request.get_json().get('name')
         cid = request.get_json().get('cid')
-        if hackername:
+        if cid == 0:
             c = Contributor.query.filter_by(author_login=hackername).first()
-        if cid:
+        else:
             c = Contributor.query.get(cid)
         if not c:
             raise NoData()
         ret = c.todict()
         ret['commit_info'] = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
-        return ret
+        return jsonify(ret)
 
 
 class GithubContribute(MethodView):
