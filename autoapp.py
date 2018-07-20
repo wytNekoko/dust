@@ -1,6 +1,6 @@
 from dust import create_app
 from dust.core import db
-from dust.models.user_planet import User, Planet, Team, BuildRecord, Suggestion
+from dust.models.user_planet import *
 
 app = create_app()
 

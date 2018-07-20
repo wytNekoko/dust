@@ -18,10 +18,15 @@ exceptions = [
     ('FileRequired', 1011, 'No file in request'),
     ('UnSupportFileType', 1012, 'Unsupported file type'),
     ('EmptyUserInfo', 1013, 'Current user is Nonetype'),
+    ('NoDust', 1014, 'Not enough gift you owned'),
+    ('NoVote', 1015, '3 votes ran out. Your team\'s voting has ended.'),
+    ('TooManyVotes', 1016, 'Your team have voted for the team too many times.'),
+    ('VoteSelfError', 1017, 'To vote yourself is not allowed'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
-    ('NoDust', 1006, 'Not enough gift you owned')
+    ('CacheTokenError', 9002, 'Redis Cache Error.'),
+
 ]
 
 

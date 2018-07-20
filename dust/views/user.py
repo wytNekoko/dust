@@ -8,7 +8,7 @@ from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..forms.bounty import *
 from ..forms.upload import *
 from ..core import current_user, db, redis_store
-from ..exceptions import FormValidationError, NoData, NoDust, NoTeam
+from ..exceptions import FormValidationError, NoData, NoDust, NoTeam, NoVote, TooManyVotes, VoteSelfError
 from ..constants import Notify, NotifyContent
 from ..helpers import register_api
 
@@ -220,9 +220,35 @@ class LeaveTeam(MethodView):
 
 class LikeTrue(MethodView):
     def get(self):
-        true = Activity.get(1)
+        true = Activity.query.get(1)
+        return jsonify(true.like)
+
+    def post(self):
+        true = Activity.query.get(1)
         true.like += 1
         return jsonify(true.like)
+
+
+class VoteView(MethodView):
+    def post(self):
+        req_data = request.get_json()
+        from_tid = req_data.get('from_tid')
+        to_tid = req_data.get('to_tid')
+        if from_tid == to_tid:
+            raise VoteSelfError()
+        t1 = Team.query.get(from_tid)
+        t2 = Team.query.get(to_tid)
+        if t1.vote == 0:
+            raise NoVote()
+        history = VoteRecord.query.filter_by(from_tid=from_tid, to_tid=to_tid).all()
+        if len(history) == 2:
+            raise TooManyVotes()
+        t1.vote -= 1
+        t2.ballot += 1
+        rec = VoteRecord(from_tid=from_tid, to_tid=to_tid)
+        db.session.add(rec)
+        db.session.commit()
+        return
 
 
 register_api(bp, FollowView, 'follow', '/follow')
@@ -239,3 +265,4 @@ bp.add_url_rule('/true', view_func=LikeTrue.as_view('like_true'))
 bp.add_url_rule('/team-manage', view_func=TeamView.as_view('team_manage'))
 bp.add_url_rule('/team-add-member', view_func=AddMember.as_view('team_add_member'))
 bp.add_url_rule('/team-leave', view_func=LeaveTeam.as_view('team_leave'))
+bp.add_url_rule('/vote', view_func=VoteView.as_view('vote'))

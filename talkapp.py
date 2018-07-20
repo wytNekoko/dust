@@ -14,7 +14,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import session
 
 from dust.core import db, current_user
-from dust.models.user_planet import MsgList, User
+from dust.models.user_planet import MsgList, User, Team
 
 thread = None
 thread_lock = Lock()
@@ -44,7 +44,6 @@ def connect():
     print('=='*10,'已连接')
 
 
-
 @socketio.on('connect_event', namespace='/websocket/user_refresh')
 def connect_event(message):
     """ 服务端接受客户端发送的通信请求 """
@@ -68,19 +67,15 @@ def connect_event(message):
     # result['msl'] = members
     # result['msl2'] = members2
 
-
     socketio.emit('init_msg', data=members, room=sid, namespace='/websocket/user_refresh')
     print('**'*10,conns)
-
-
-
 
 
 @socketio.on('send_message', namespace='/websocket/user_refresh')
 def send_message(message):
 
     print('send_message',message)
-    user_id =  message['from_id']
+    user_id = message['from_id']
     if user_id == None:
         return
     user = User.query.get(user_id)
@@ -138,18 +133,17 @@ def send_message(message):
     db.session.commit()
 
 
-
 @socketio.on('add_group', namespace='/websocket/user_refresh')
 def send_message(message):
     print(message)
     from_id = message['from_id']
     to_id = message['to_id']
     us = User.query.get(to_id)
-    u = dict(url=us.avatar, name=us.hacker_name, intro=us.slogan, uid=us.id,cteam_id=us.cteam_id)
+    u = dict(avatar=us.avatar, name=us.hacker_name, intro=us.slogan, uid=us.id,cteam_id=us.cteam_id)
 
     # {url: 'images/6.png', name: '4', id: 4, txt: `I’m glad to join your team  `, time: '2016/06/16', readstate: 0, isgroup: 0, apply: 1}
     result = {}
-    result['url'] = u['url']
+    result['avatar'] = u['avatar']
     result['name'] = u['name']
     result['id'] = from_id
     result['time'] = time.strftime("%Y/%m/%d %H", time.localtime())
@@ -163,7 +157,6 @@ def send_message(message):
     else:
         result['txt'] = '我想加入团队:  ' + message['msg']
 
-
     result1 = {}
     result1['avatar'] = us.avatar
     result1['name'] = us.hacker_name
@@ -173,7 +166,6 @@ def send_message(message):
     result1['from_id'] = to_id
     result1['to_id'] = from_id
     result1['isgroup'] = 0
-
 
     if from_id in conns.keys() and to_id in conns.keys():
         from_sid = conns[from_id]
@@ -204,23 +196,16 @@ def send_message(message):
     db.session.commit()
 
 
-
-
 @socketio.on('add_group_judge', namespace='/websocket/user_refresh')
 def send_message(message):
     print(message)
-
-
 
     from_id = message['from_id']
     to_id = message['to_id']
     to_sid = conns[to_id]
     from_sid = conns[from_id]
 
-
-
     fus = User.query.get(from_id)
-
 
     # 返回确认信息
     result = {}
@@ -229,7 +214,6 @@ def send_message(message):
     result['msg'] = '加入成功！！'
     result['time'] = time.strftime("%Y/%m/%d %H", time.localtime())
     result['isgroup'] = 0
-
 
     if message['isNO'] ==1:
         result['from_id'] = to_id
@@ -244,14 +228,11 @@ def send_message(message):
         socketio.emit('get_msg', data=result, room=to_sid, namespace='/websocket/user_refresh')
         return
 
-
-
     isinvitation = message['isinvitation']
     if isinvitation == 1:
 
-
-        #现在是否以加入团队
-        if (fus.cteam_id !=0):
+        # 现在是否以加入团队
+        if fus.cteam_id != 0:
 
             result['from_id'] = to_id
             result['id'] = to_id
@@ -265,13 +246,12 @@ def send_message(message):
             socketio.emit('get_msg', data=result, room=to_sid, namespace='/websocket/user_refresh')
             return
 
-
         # 接受邀请后是否队伍数量已满
         us = User.query.get(to_id)
         fus_t = User.query.filter_by(cteam_id=us.cteam_id)
         fus_count = fus_t.with_entities(func.count(User.id)).scalar()
         # 邀请方团队是否超过最大数量
-        if (fus_count > 5):
+        if fus_count > 6:
 
             result['from_id'] = to_id
             result['id'] = to_id
@@ -286,6 +266,8 @@ def send_message(message):
             return
 
         fus.cteam_id = us.cteam_id
+        t = Team.query.get(us.cteam_id)
+        t.users.append(fus)
         db.session.commit()
 
         # 返回群的信息
@@ -309,7 +291,6 @@ def send_message(message):
 
 
     else:
-
         # 邀请方是否加入或创建了团队
         if (fus.cteam_id == 0):
             result['from_id'] = to_id
@@ -324,12 +305,11 @@ def send_message(message):
             socketio.emit('get_msg', data=result, room=to_sid, namespace='/websocket/user_refresh')
             return
 
-
         # 接受邀请后是否队伍数量已满
         fus_t = User.query.filter_by(cteam_id=fus.cteam_id)
         fus_count = fus_t.with_entities(func.count(User.id)).scalar()
         # 邀请方团队是否超过最大数量
-        if (fus_count > 5):
+        if fus_count > 6:
 
             result['from_id'] = to_id
             result['id'] = to_id
@@ -345,7 +325,7 @@ def send_message(message):
 
         us = User.query.get(to_id)
         # 被邀请是否有团队
-        if (us.cteam_id != 0):
+        if us.cteam_id != 0:
             result['from_id'] = to_id
             result['id'] = to_id
             result['msg'] = '已有团队！！'
@@ -358,8 +338,9 @@ def send_message(message):
             socketio.emit('get_msg', data=result, room=to_sid, namespace='/websocket/user_refresh')
             return
 
-
         us.cteam_id = fus.cteam_id
+        t = Team.query.get(fus.cteam_id)
+        t.users.append(us)
         db.session.commit()
 
         # 返回群的信息
@@ -401,8 +382,7 @@ def exit_group(message):
     result['time'] = time.strftime("%Y/%m/%d %H", time.localtime())
     result['isgroup'] = 0
 
-    if(user.cteam_id!=0):
-
+    if user.cteam_id != 0:
 
         if user.is_admin ==0:
             user.cteam_id=0

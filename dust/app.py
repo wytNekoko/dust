@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from .core import db, logger, redis_store, oauth_client, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
-from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
+from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired, CacheTokenError, NoData
 
 
 def create_app(config=None):
@@ -51,11 +51,11 @@ def before_request(app):
         uid = int(cache_data.get('id', '0'))
         if not uid:
             logger.debug('auth: cache no id, %s', cache_data)
-            raise LoginRequired
+            raise CacheTokenError()
 
         user = User.query.get(uid)
         if not user:  # or user.password != cache_data['password']:
-            raise LoginRequired
+            raise NoData()
 
         # 设置user
         ctx = _request_ctx_stack.top
