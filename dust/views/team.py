@@ -29,7 +29,7 @@ class TeamList(MethodView):
         res = list()
         for t in ts:
             members = [dict(username=u.username, role=u.role, avatar=u.avatar)for u in t.users]
-            tmp = dict(name=t.name, members=members)
+            tmp = dict(name=t.name, tid=t.id, members=members)
             res.append(tmp)
         return jsonify(res)
 
@@ -39,7 +39,7 @@ class Attender(MethodView):
         us = User.query.filter_by(role=role)
 
         if us:
-            return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan, uid=u.id) for u in us])
+            return jsonify([dict(url=u.avatar, name=u.hacker_name, intro=u.slogan, uid=u.id, team_id=u.cteam_id) for u in us])
         else:
             raise NoData()
 
