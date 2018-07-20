@@ -101,15 +101,15 @@ class ProjectForm(FForm):
     def set(self, pid):
         item = Project.query.get(pid)
         item.name = self.name.data
-        item.logo = get_file('logo')
+        logo_url = get_file('logo')
+        item.logo = logo_url
         item.intro = self.desc.data
         if self.demo.data:
             item.demo = self.demo.data
         else:
             urls = get_files()
-            for index, url in enumerate(urls):
-                if index < len(urls) - 1:
-                    item.photos.append(DemoPhoto(url=url, project_id=pid))
+            for url in urls:
+                item.photos.append(DemoPhoto(url=url, project_id=pid))
         db.session.add(item)
         db.session.commit()
         return item
@@ -120,7 +120,7 @@ class ProjectForm(FForm):
         for usr in t.users:
             usr.owned_dust += 100
         db.session.add(p)
-        db.session.flush()
+        db.session.commit()
         return self.set(p.id)
 
 

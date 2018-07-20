@@ -55,7 +55,8 @@ class Hacker(MethodView):
         if not c:
             raise NoData()
         ret = c.todict()
-        ret['commit_info'] = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
+        records = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
+        ret['commit_info'] = [r.todict() for r in records]
         return jsonify(ret)
 
 
