@@ -1,13 +1,11 @@
 import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
-from flask_socketio import SocketIO
 
-from .core import db, logger, redis_store, oauth_client, socketIO, oss
+from .core import db, logger, redis_store, oauth_client, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired
-from flask_cors import CORS, cross_origin
 
 
 def create_app(config=None):
@@ -20,8 +18,6 @@ def create_app(config=None):
     redis_store.init_app(app)
     oauth_client.init_app(app)
     oss.init_app(app)
-    #chat
-    socketIO.init_app(app)
 
     before_request(app)
     register_blueprints(app, __name__.split('.', 1)[0] + '.views')

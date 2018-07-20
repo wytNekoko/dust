@@ -16,8 +16,6 @@ db = SQLAlchemy(model_class=ModelMixin)
 redis_store = FlaskRedis(decode_responses=True, decode_components=True)
 oss = FlaskOSS()
 oauth_client = OAuthApi()
-#chat
-async_mode=None
-socketIO = SocketIO(async_mode=async_mode)
+
 
 

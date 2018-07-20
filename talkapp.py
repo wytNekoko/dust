@@ -377,7 +377,6 @@ def send_message(message):
         # {avatar: 'images/6.png', msg: `What if we make a power machine to get
         # the arc.deepened?`, man: 'other', read: 1, from_id: '5', to_id: 7, isgroup: 0}
 
-
     result['from_id'] = to_id
     result['id'] = to_id
     result['to_id'] = from_id
@@ -387,9 +386,6 @@ def send_message(message):
     result['id'] = from_id
     result['to_id'] = to_id
     socketio.emit('get_msg', data=result, room=to_sid, namespace='/websocket/user_refresh')
-
-
-
 
 
 @socketio.on('exit_group', namespace='/websocket/user_refresh')
@@ -435,7 +431,6 @@ def exit_group(message):
         result['msg'] = '没有队伍！！！无法退出！'
         sid = conns[from_id]
         socketio.emit('get_msg', data=result, room=sid, namespace='/websocket/user_refresh')
-
 
 
 if __name__ == '__main__':
