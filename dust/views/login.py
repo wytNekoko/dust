@@ -69,6 +69,7 @@ class LoginAuthGithub(MethodView):
             u.avatar = user_info.get('avatar_url')
             db.session.add(u)
             db.session.flush()
+            db.session.commit()
         elif u1 and not u2:
             u = u1
         elif u2 and not u1:
