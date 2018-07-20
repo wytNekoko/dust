@@ -189,7 +189,8 @@ class TeamView(MethodView):
 
     def delete(self):
         item = Team.query.get(current_user.cteam_id)
-        item.delete()
+        db.session.delete(item)
+        db.session.commit()
         return jsonify('team dismiss')
 
 
