@@ -171,7 +171,7 @@ class TeamView(MethodView):
         u = User.query.get(current_user.id)
         u.cteam_id = t.id
         db.session.commit()
-        return t
+        return t.todict()
 
     def put(self):
         if current_user.cteam_id == 0:
