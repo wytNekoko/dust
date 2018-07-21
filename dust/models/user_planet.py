@@ -103,6 +103,7 @@ class User(db.Model, TimestampMixin):
     planet_dust_sum = db.Column(db.Integer, nullable=False, default=0, comment='Dust sum of owned planets')
     gift_addr = db.Column(db.String(150), nullable=False, default='NOT SAVE', comment='KCash Gift address')
     eth = db.Column(db.String(150), nullable=False, default='NOT SAVE', comment='Eth address')
+    bch = db.Column(db.String(150), nullable=False, default='NOT SAVE', comment='Bch address')
     slogan = db.Column(db.String(500), nullable=False, default='', comment='Slogan for teaming up')
     invitation_code = db.Column(db.String(50), nullable=False, default='')
     # one-to-many

@@ -60,7 +60,7 @@ class AttenderForm(FForm):
     city = StringField('city', [DataRequired(), Length(max=500, min=1)])
     role = StringField('role', [DataRequired()])
     org = StringField('org', [DataRequired(), Length(min=1)])
-    eth = StringField('eth', [DataRequired(), Length(min=5)])
+    bch = StringField('bch', [DataRequired(), Length(min=5)])
     slogan = StringField('slogan')
 
     def __init__(self, *args, **kwargs):
@@ -79,7 +79,7 @@ class AttenderForm(FForm):
         u.city = self.city.data
         u.role = self.role.data
         u.organization = self.org.data
-        u.eth = self.eth.data
+        u.bch = self.bch.data
         if self.slogan.data:
             u.slogan = self.slogan.data
         u.is_hacker = True
