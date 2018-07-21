@@ -6,6 +6,7 @@ from .core import db, logger, redis_store, oauth_client, oss
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired, CacheTokenError, NoData
+from flask_cors import CORS, cross_origin
 
 
 def create_app(config=None):
@@ -18,6 +19,7 @@ def create_app(config=None):
     redis_store.init_app(app)
     oauth_client.init_app(app)
     oss.init_app(app)
+    CORS(app, supports_credentials=True)  # 设置参数
 
     before_request(app)
     register_blueprints(app, __name__.split('.', 1)[0] + '.views')
