@@ -189,6 +189,7 @@ class TeamView(MethodView):
 
     def delete(self):
         item = Team.query.get(current_user.cteam_id)
+        current_user.cteam_id = 0
         db.session.delete(item)
         db.session.commit()
         return jsonify('team dismiss')
@@ -213,6 +214,7 @@ class LeaveTeam(MethodView):
     def post(self):
         if current_user.cteam_id == 0:
             raise NoTeam()
+        current_user.cteam_id = 0
         t = Team.query.get(current_user.cteam_id)
         t.users.remove(current_user)
         db.session.commit()
