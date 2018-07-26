@@ -262,22 +262,21 @@ class WithdrawRecord(db.Model, TimestampMixin):
 class TalkList(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.Integer, db.ForeignKey('user.id'))
-    txt = db.Column(db.String(255))
-    time = db.Column(db.String(255))
-    readstate = db.Column(db.String(255))
-    isgroup = db.Column(db.Integer)
-    apply = db.Column(db.String(255))
+    txt = db.Column(db.TEXT)
+    time = db.Column(db.DateTime)
+    readstate = db.Column(db.Boolean)
+    isgroup = db.Column(db.Boolean)
+    apply = db.Column(db.Boolean)
 
 
 class MsgList(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
-    msg = db.Column(db.String)
+    msg = db.Column(db.TEXT)
     read = db.Column(db.Integer)
     from_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     to_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    istalk = db.Column(db.Integer)
-    isgroup = db.Column(db.Integer)
-    created_at = db.Column(db.Date)
+    istalk = db.Column(db.Boolean)
+    isgroup = db.Column(db.Boolean)
 
 
 
