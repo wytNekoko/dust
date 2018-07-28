@@ -1,12 +1,14 @@
 import os
-from flask import _request_ctx_stack, jsonify, request
+from flask import _request_ctx_stack, jsonify, request, current_app
 from flask_migrate import Migrate
 
-from .core import db, logger, redis_store, oauth_client, oss
+from .core import db, logger, redis_store, oauth_client, oss, mail
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired, CacheTokenError, NoData
 from flask_cors import CORS, cross_origin
+from flask_mail import Mail
+
 
 
 def create_app(config=None):
@@ -20,6 +22,9 @@ def create_app(config=None):
     oauth_client.init_app(app)
     oss.init_app(app)
     CORS(app, supports_credentials=True)  # 设置参数
+    mail.init_app(app)
+
+
 
     before_request(app)
     register_blueprints(app, __name__.split('.', 1)[0] + '.views')

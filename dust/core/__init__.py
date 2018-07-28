@@ -1,4 +1,5 @@
 from flask import _request_ctx_stack, current_app
+from flask_mail import Mail
 from werkzeug.local import LocalProxy
 
 from flask_sqlalchemy import SQLAlchemy
@@ -16,6 +17,7 @@ db = SQLAlchemy(model_class=ModelMixin)
 redis_store = FlaskRedis(decode_responses=True, decode_components=True)
 oss = FlaskOSS()
 oauth_client = OAuthApi()
+mail = Mail()
 
 
 

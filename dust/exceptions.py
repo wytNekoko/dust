@@ -26,6 +26,7 @@ exceptions = [
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
     ('CacheTokenError', 9002, 'Redis Cache Error.'),
+    ('ResetTokenError', 9003, 'Redis Cache Error.'),
 
 ]
 

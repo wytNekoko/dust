@@ -3,9 +3,10 @@ import os
 from datetime import datetime
 from flask import Blueprint, current_app, request
 from flask.views import MethodView
+from flask_mail import Message
 
-from ..core import redis_store,  db, oauth_client
-from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError, RegisterFailError
+from ..core import redis_store, db, oauth_client, mail
+from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError, RegisterFailError ,ResetTokenError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -96,6 +97,61 @@ class LoginAuthGithub(MethodView):
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=u.todict())
 
 
+
+class resetPassword(MethodView):
+    def post(self):
+        data = request.get_json() or {}
+
+        email = data.get('email')
+        if not (email):
+            raise LoginInfoRequired
+
+        user = User.get_by_email(email)
+        if not (user):
+            raise LoginInfoError
+
+        auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
+        redis_store.hmset(auth_token, dict(
+            email=email,
+            created_at=datetime.now(),
+        ))
+        expires_in = 600  # expire in 1 sec
+        redis_store.expire(auth_token, expires_in)
+        msg = Message(subject='密码重置',  # 需要使用默认发送者则不用填
+                      recipients=[email])
+        # 邮件内容会以文本和html两种格式呈现，而你能看到哪种格式取决于你的邮件客户端。
+        msg.html = "<b>请点击一下链接修改密码：<a href='http://192.168.196.129:8080/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
+        mail.send(msg)
+
+        return dict(state=0)
+
+class resetPassword2(MethodView):
+    def post(self):
+        data = request.get_json() or {}
+
+        token = data.get('token')
+        passwd = data.get('passwd')
+
+        if not (token and passwd):
+            raise LoginInfoRequired
+
+        if not redis_store.exists(token):
+            raise ResetTokenError
+
+        token_info = redis_store.hget(token,'email')
+        user = User.get_by_email(token_info)
+        user.password=passwd
+        db.session.commit()
+
+        # auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
+
+        return dict(state=0)
+
+
+
+
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
+bp.add_url_rule('/resetpassword', view_func=resetPassword.as_view('resetpassword'))
+bp.add_url_rule('/resetPassword2', view_func=resetPassword2.as_view('resetPassword2'))
 bp.add_url_rule('/auth-login/github', view_func=LoginAuthGithub.as_view('login_github'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
