@@ -282,5 +282,8 @@ class MsgList(db.Model, TimestampMixin):
     isgroup = db.Column(db.Boolean)
 
 
-
+class Invitation(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.Integer)
+    invitation_code = db.Column(db.String(50))
 

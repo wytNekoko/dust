@@ -142,9 +142,6 @@ class resetPassword2(MethodView):
         user = User.get_by_email(token_info)
         user.password=passwd
         db.session.commit()
-
-        # auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
-
         return dict(state=0)
 
 
