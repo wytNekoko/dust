@@ -153,3 +153,32 @@ class ProfileForm(FForm):
         u.eth = self.eth.data
         db.session.commit()
         return u
+
+
+class DAppForm(FForm):
+    name = Field('name', [DataRequired(), Length(max=50, min=1)])
+    git = StringField('git', [DataRequired(), URL()])
+    intro = StringField('intro', [DataRequired()])
+    demo = StringField('demo', [URL()])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def set(self, pid):
+        item = DApp.query.get(pid)
+        item.name = self.name.data
+        item.git = self.git.data
+        logo_url = get_file('logo')
+        item.logo = logo_url
+        item.intro = self.intro.data
+        db.session.add(item)
+        db.session.commit()
+        return item
+
+    def create(self):
+        p = DApp(uid=current_user.id)
+        current_user.owned_dust += 100
+        db.session.add(p)
+        db.session.flush()
+        return self.set(p.id)
+

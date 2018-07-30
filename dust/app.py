@@ -2,7 +2,7 @@ import os
 from flask import _request_ctx_stack, jsonify, request
 from flask_migrate import Migrate
 
-from .core import db, logger, redis_store, oauth_client, oss
+from .core import db, logger, redis_store, oauth_client, oss, mail
 from .models.user_planet import User
 from .helpers import CustomFlask, register_blueprints
 from .exceptions import CustomException, FormValidationError, APITokenError, LoginRequired, CacheTokenError, NoData
@@ -19,6 +19,7 @@ def create_app(config=None):
     redis_store.init_app(app)
     oauth_client.init_app(app)
     oss.init_app(app)
+    mail.init_app(app)
     CORS(app, supports_credentials=True)  # 设置参数
 
     before_request(app)

@@ -7,17 +7,24 @@ from . import TimestampMixin
 from ..constants import *
 
 
-class Activity(db.Model, TimestampMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False, default='')
-    like = db.Column(db.Integer, nullable=False, default=0)
-
-
 team_user_table = db.Table(
     'teammates', db.Model.metadata,
     db.Column('team_id', db.Integer, db.ForeignKey('team.id')),
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
     )
+
+user_like_activity_table = db.Table(
+    'user_like_activity', db.Model.metadata,
+    db.Column('activity_id', db.Integer, db.ForeignKey('activity.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+)
+
+
+class Activity(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, default='')
+    like = db.Column(db.Integer, nullable=False, default=0)
+    likers = db.relationship('User', secondary=user_like_activity_table, back_populates='activities')
 
 
 class Team(db.Model, TimestampMixin):
@@ -48,6 +55,19 @@ class Project(db.Model, TimestampMixin):
     logo = db.Column(db.String(191), nullable=False, default='', comment='url for logo')
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'))
     photos = db.relationship('DemoPhoto', cascade="all, delete-orphan")
+
+
+class DApp(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, default='')
+    git = db.Column(db.String(191), nullable=False, default='')
+    intro = db.Column(db.String(3000), nullable=False, default='')
+    demo = db.Column(db.String(191), nullable=False, default='')
+    logo = db.Column(db.String(191), nullable=False, default='', comment='url for logo')
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    vote = db.Column(db.Integer, nullable=False, default=0)
+    # one to many
+    voters = db.relationship('User', back_populates='vote_dapp')
 
 
 class DemoPhoto(db.Model, TimestampMixin):
@@ -118,6 +138,9 @@ class User(db.Model, TimestampMixin):
                                 primaryjoin=id==user_following.c.user_id,
                                 secondaryjoin=id==user_following.c.following_id,
                                 backref='followers')
+    vote_dapp_id = db.Column(db.Integer, db.ForeignKey('d_app.id'))
+    vote_dapp = db.relationship('DApp', back_populates='voters')
+    dapps = db.relationship('DApp')
 
     def follow(self, other):
         if other not in self.following:

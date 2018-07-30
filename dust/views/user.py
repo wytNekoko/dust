@@ -2,7 +2,6 @@ from datetime import datetime, time
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 
-
 from ..models.user_planet import *
 from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..forms.bounty import *
@@ -221,18 +220,33 @@ class LeaveTeam(MethodView):
         return t.users
 
 
-class LikeTrue(MethodView):
-    def get(self):
-        true = Activity.query.get(1)
-        return jsonify(true.like)
+class LikeActivity(MethodView):
+    def get(self, item_id):
+        ac = Activity.query.get(item_id)
+        is_like = False
+        if current_user:
+            logger.debug('current_user: %s', current_user)
+            if current_user in ac.likers:
+                is_like = True
+        return jsonify(dict(like_num=ac.like, is_like=is_like))
 
     def post(self):
-        true = Activity.query.get(1)
-        true.like += 1
-        return jsonify(true.like)
+        data = request.get_json()
+        ac = Activity.query.filter_by(name=data.get('name'))
+        ac.like += 1
+        ac.likers.append(current_user)
+        db.session.commit()
+        return jsonify(ac.like)
+
+    def delete(self, item_id):
+        ac = Activity.query.get(item_id)
+        ac.likers.remove(current_user)
+        ac.like -= 1
+        db.session.commit()
+        return jsonify(ac.like)
 
 
-class VoteView(MethodView):
+class TeamVoteView(MethodView):
     def post(self):
         req_data = request.get_json()
         from_tid = req_data.get('from_tid')
@@ -254,7 +268,16 @@ class VoteView(MethodView):
         return
 
 
+class DAppVoteView(MethodView):
+    def post(self):
+        pass
+
+    def delete(self):
+        pass
+
+
 register_api(bp, FollowView, 'follow', '/follow')
+register_api(bp, LikeActivity, 'like', '/like')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
@@ -264,8 +287,8 @@ bp.add_url_rule('/up-project', view_func=UploadProject.as_view('upload_project')
 bp.add_url_rule('/set-project', view_func=SetProject.as_view('set_project'))
 bp.add_url_rule('/upload-info', view_func=UploadInfo.as_view('upload_info'))
 bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))
-bp.add_url_rule('/true', view_func=LikeTrue.as_view('like_true'))
 bp.add_url_rule('/team-manage', view_func=TeamView.as_view('team_manage'))
 bp.add_url_rule('/team-add-member', view_func=AddMember.as_view('team_add_member'))
 bp.add_url_rule('/team-leave', view_func=LeaveTeam.as_view('team_leave'))
-bp.add_url_rule('/vote', view_func=VoteView.as_view('vote'))
+bp.add_url_rule('/team-vote', view_func=TeamVoteView.as_view('vote'))
+
