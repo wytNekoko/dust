@@ -116,7 +116,7 @@ class ResetPassword(MethodView):
         msg = Message(subject='密码重置',  # 需要使用默认发送者则不用填
                       recipients=[email])
         # 邮件内容会以文本和html两种格式呈现，而你能看到哪种格式取决于你的邮件客户端。
-        msg.html = "<b>请点击一下链接修改密码：<a href='http://192.168.196.129:8080/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
+        msg.html = "<b>请点击一下链接修改密码：<a href='http://ranking.dorahacks.com/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
         mail.send(msg)
         return dict(state=0)
 
