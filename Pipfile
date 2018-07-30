@@ -16,6 +16,7 @@ gunicorn = "*"
 # flask-paginate = "*"
 flask_cors = "*"
 flask-socketio = "*"
+flask-mail = "*"
 
 [dev-packages]
 "flake8" = "*"

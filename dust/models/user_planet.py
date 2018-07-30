@@ -145,6 +145,10 @@ class User(db.Model, TimestampMixin):
     def get_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 
+    @classmethod
+    def get_by_email(cls, email):
+        return cls.query.filter_by(email=email).first()
+
 
 class Planet(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
