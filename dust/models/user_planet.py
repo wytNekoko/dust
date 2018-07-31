@@ -57,19 +57,6 @@ class Project(db.Model, TimestampMixin):
     photos = db.relationship('DemoPhoto', cascade="all, delete-orphan")
 
 
-class DApp(db.Model, TimestampMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, default='')
-    git = db.Column(db.String(191), nullable=False, default='')
-    intro = db.Column(db.String(3000), nullable=False, default='')
-    demo = db.Column(db.String(191), nullable=False, default='')
-    logo = db.Column(db.String(191), nullable=False, default='', comment='url for logo')
-    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
-    vote = db.Column(db.Integer, nullable=False, default=0)
-    # one to many
-    voters = db.relationship('User', back_populates='vote_dapp')
-
-
 class DemoPhoto(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
@@ -131,6 +118,7 @@ class User(db.Model, TimestampMixin):
     suggestions = db.relationship('Suggestion')
     bounty_rewards = db.relationship('BountyReward')
     # many-to-many
+    activities = db.relationship('Activity', secondary=user_like_activity_table, back_populates='likers')
     teams = db.relationship('Team', secondary=team_user_table, back_populates='users')
     cteam_id = db.Column(db.Integer, nullable=False, default=0, comment='Current team id')
 
@@ -138,8 +126,7 @@ class User(db.Model, TimestampMixin):
                                 primaryjoin=id==user_following.c.user_id,
                                 secondaryjoin=id==user_following.c.following_id,
                                 backref='followers')
-    vote_dapp_id = db.Column(db.Integer, db.ForeignKey('d_app.id'))
-    vote_dapp = db.relationship('DApp', back_populates='voters')
+    # one-to-many
     dapps = db.relationship('DApp')
 
     def follow(self, other):
@@ -171,6 +158,23 @@ class User(db.Model, TimestampMixin):
     @classmethod
     def get_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+
+
+class DApp(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, default='')
+    git = db.Column(db.String(191), nullable=False, default='')
+    intro = db.Column(db.String(3000), nullable=False, default='')
+    demo = db.Column(db.String(191), nullable=False, default='')
+    logo = db.Column(db.String(191), nullable=False, default='', comment='url for logo')
+    uid = db.Column(db.Integer, db.ForeignKey('user.id'))
+    vote = db.Column(db.Integer, nullable=False, default=0)
+
+
+class DAppVoteRecord(db.Model, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    from_uid = db.Column(db.Integer)
+    to_did = db.Column(db.Integer)
 
 
 class Planet(db.Model, TimestampMixin):

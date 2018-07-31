@@ -7,7 +7,7 @@ from ..forms.planet import BuildPlanetForm, SetupPlanetForm
 from ..forms.bounty import *
 from ..forms.upload import *
 from ..core import current_user, db, redis_store
-from ..exceptions import FormValidationError, NoData, NoDust, NoTeam, NoVote, TooManyVotes, VoteSelfError
+from ..exceptions import FormValidationError, NoData, NoDust, NoTeam, NoVote, TooManyVotes, VoteSelfError, VoteDAppError
 from ..constants import Notify, NotifyContent
 from ..helpers import register_api
 
@@ -270,14 +270,34 @@ class TeamVoteView(MethodView):
 
 class DAppVoteView(MethodView):
     def post(self):
-        pass
+        data = request.get_json()
+        dapp_id = data.get('dapp_id')
+        if not current_user:
+            raise NoData()
+        record = DAppVoteRecord.query.filter_by(from_uid=current_user.id).first()
+        if record:
+            raise VoteDAppError()
+        v = DAppVoteRecord(from_uid=current_user.id, to_did=dapp_id)
+        dapp = DApp.query.get(dapp_id)
+        dapp.vote += 1
+        db.session.add(v)
+        db.session.commit()
+        return dapp.todict()
 
-    def delete(self):
-        pass
+    def delete(self, item_id):
+        dapp = DApp.query.get(item_id)
+        record = DAppVoteRecord.query.filter_by(from_uid=current_user.id, to_did=item_id).first()
+        if (not dapp) or (not current_user) or (not record):
+            raise NoData()
+        dapp.vote -= 1
+        db.session.delete(record)
+        db.session.commit()
+        return dapp.todict()
 
 
 register_api(bp, FollowView, 'follow', '/follow')
 register_api(bp, LikeActivity, 'like', '/like')
+register_api(bp, DAppVoteView, 'dapp_vote', '/dapp-vote')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
@@ -290,5 +310,5 @@ bp.add_url_rule('/check-team', view_func=CheckTeam.as_view('check_team'))
 bp.add_url_rule('/team-manage', view_func=TeamView.as_view('team_manage'))
 bp.add_url_rule('/team-add-member', view_func=AddMember.as_view('team_add_member'))
 bp.add_url_rule('/team-leave', view_func=LeaveTeam.as_view('team_leave'))
-bp.add_url_rule('/team-vote', view_func=TeamVoteView.as_view('vote'))
+bp.add_url_rule('/team-vote', view_func=TeamVoteView.as_view('team_vote'))
 

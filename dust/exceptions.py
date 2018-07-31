@@ -22,6 +22,7 @@ exceptions = [
     ('NoVote', 1015, '3 votes ran out. Your team\'s voting has ended.'),
     ('TooManyVotes', 1016, 'Your team have voted for the team too many times.'),
     ('VoteSelfError', 1017, 'To vote yourself is not allowed'),
+    ('VoteDAppError', 1018, 'Only ONE vote for ONE DApp is allowed.'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),
