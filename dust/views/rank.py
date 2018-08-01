@@ -76,7 +76,7 @@ class ProjectView(MethodView):
 
 class NknContributorsView(MethodView):
     def get(self):
-        records = ContributeRecord.query.filter_by(chain_name='NKN').group_by(ContributeRecord.author_id).all()
+        records = ContributeRecord.query.filter_by(chain_name='NKN').order_by(ContributeRecord.author_id.desc()).all()
         tmp = list()
         for r in records:
             if not tmp:
