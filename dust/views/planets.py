@@ -1,9 +1,10 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 from sqlalchemy import func
 
+from ..core import redis_store, logger
 from ..models.user_planet import *
-from ..exceptions import NoData
+from ..exceptions import NoData, CacheTokenError
 from ..constants import Status
 
 bp = Blueprint('planets', __name__, url_prefix='/planets')
@@ -73,8 +74,30 @@ class ProjectView(MethodView):
         return jsonify(ret)
 
 
+class DAppListView(MethodView):
+    def get(self, uid):
+        ds = DApp.query.order_by(DApp.vote.desc()).all()
+        ret = dict()
+        ret['dapps'] = [d.todict() for d in ds]
+        ret['voted_dapp_id'] = 0
+        if uid != 0:
+            record = DAppVoteRecord.query.filter_by(from_uid=uid).first()
+            if record:
+                ret['voted_dapp_id'] = record.to_did
+        return jsonify(ret)
+
+
+class DAppView(MethodView):
+    def get(self, did):
+        dapp = DApp.query.get(did)
+        if not dapp:
+            return None
+        return dapp.todict()
+
+
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
 bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view('one_planet'))
 bp.add_url_rule('/all', view_func=AllPlanetsView.as_view('all_planets'))
 bp.add_url_rule('/ranklist', view_func=RankListView.as_view('rank_list'))
-
+bp.add_url_rule('/dapp/list/<int:uid>', view_func=DAppListView.as_view('dapp_list'))
+bp.add_url_rule('/dapp/<int:did>', view_func=DAppView.as_view('dapp'))

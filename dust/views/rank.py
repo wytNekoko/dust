@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask.views import MethodView
 from sqlalchemy import desc
+from ..helpers import *
 from ..models.user_planet import *
 from ..models.monthly_focus import TopOwners, TopBuilders, TopPlanets
 
@@ -73,8 +74,28 @@ class ProjectView(MethodView):
         return jsonify(res)
 
 
+class NknContributorsView(MethodView):
+    def get(self):
+        records = ContributeRecord.query.filter_by(chain_name='NKN').group_by(ContributeRecord.author_login).all()
+        tmp = list()
+        for r in records:
+            if not tmp:
+                t = r.todict()
+                t['github'] = 'https://github.com' + r.author_login
+                tmp.append(t)
+                continue
+            if tmp[-1].author_login == r.author_login:
+                tmp[-1].commit += r.commit
+            else:
+                t = r.todict()
+                t['github'] = 'https://github.com' + r.author_login
+                tmp.append(t)
+        return jsonify(tmp)
+
+
 bp.add_url_rule('/dashboard', view_func=DashboardView.as_view('rank_dashboard'))
 bp.add_url_rule('/winners', view_func=WinnerView.as_view('rank_winners'))
 bp.add_url_rule('/bounty', view_func=BountyView.as_view('rank_bounty'))
 bp.add_url_rule('/hacker', view_func=HackerView.as_view('rank_hackers'))
 bp.add_url_rule('/project', view_func=ProjectView.as_view('rank_projects'))
+bp.add_url_rule('/nkn/contributors', view_func=NknContributorsView.as_view('NKN_contributors'))

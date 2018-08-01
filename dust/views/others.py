@@ -1,11 +1,9 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from flask.views import MethodView
-from ..core import current_user
 from ..forms.others import FeedbackForm
 from ..exceptions import FormValidationError
-from ..models.user_planet import Notification
-
+from ..models.user_planet import *
 
 bp = Blueprint('others', __name__)
 

@@ -12,6 +12,10 @@ from werkzeug.utils import find_modules
 from flask import Blueprint, Flask, jsonify
 
 
+def sort_dict_commit(item):
+    return item.commit
+
+
 def register_blueprints(app, import_path, bp_name='bp'):
     """Register all Blueprint instances on the specified Flask application found
     in all modules for the specified package.
