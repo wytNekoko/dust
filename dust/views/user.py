@@ -314,6 +314,16 @@ class UploadDAppView(MethodView):
         else:
             raise FormValidationError(form)
 
+    def delete(self, item_id):
+        d = DApp.query.get(item_id)
+        if not d:
+            raise NoData()
+        current_user.dapps.remove(d)
+        db.session.remove(d)
+        current_user.owned_dust -= 100
+        db.session.commit()
+        return
+
 
 register_api(bp, FollowView, 'follow', '/follow')
 register_api(bp, LikeActivity, 'like', '/like')
