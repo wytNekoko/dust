@@ -88,11 +88,12 @@ class DAppListView(MethodView):
 
 
 class DAppView(MethodView):
-    def get(self, did):
-        dapp = DApp.query.get(did)
+    def get(self, uid):
+        dapp = DApp.query.filter_by(uid=uid).all()
         if not dapp:
-            return None
-        return dapp.todict()
+            raise NoData()
+        ret = [d.todict() for d in dapp]
+        return jsonify(ret)
 
 
 bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
@@ -100,4 +101,4 @@ bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view(
 bp.add_url_rule('/all', view_func=AllPlanetsView.as_view('all_planets'))
 bp.add_url_rule('/ranklist', view_func=RankListView.as_view('rank_list'))
 bp.add_url_rule('/dapp/list/<int:uid>', view_func=DAppListView.as_view('dapp_list'))
-bp.add_url_rule('/dapp/<int:did>', view_func=DAppView.as_view('dapp'))
+bp.add_url_rule('/dapp/<int:uid>', view_func=DAppView.as_view('dapp'))
