@@ -76,7 +76,7 @@ class ProjectView(MethodView):
 
 class NknContributorsView(MethodView):
     def get(self):
-        records = ContributeRecord.query.filter_by(chain_name='NKN').group_by(ContributeRecord.author_login).all()
+        records = ContributeRecord.query.filter_by(chain_name='NKN').group_by(ContributeRecord.author_id).all()
         tmp = list()
         for r in records:
             if not tmp:
@@ -84,7 +84,7 @@ class NknContributorsView(MethodView):
                 t['github'] = 'https://github.com' + r.author_login
                 tmp.append(t)
                 continue
-            if tmp[-1].author_login == r.author_login:
+            if tmp[-1].author_id == r.author_id:
                 tmp[-1].commit += r.commit
             else:
                 t = r.todict()
