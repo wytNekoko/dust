@@ -295,9 +295,30 @@ class DAppVoteView(MethodView):
         return dapp.todict()
 
 
+class UploadDAppView(MethodView):
+    def get(self, item_id):
+        d = DApp.query.get(item_id)
+        if not d:
+            raise NoData()
+        return d.todict()
+
+    def post(self):
+        form = ProjectForm()
+        if form.validate():
+            p = Project.query.filter_by(name=form.name.data).first()
+            if p:
+                res = form.set(p.id)
+            else:
+                res = form.create()
+            return res.todict()
+        else:
+            raise FormValidationError(form)
+
+
 register_api(bp, FollowView, 'follow', '/follow')
 register_api(bp, LikeActivity, 'like', '/like')
 register_api(bp, DAppVoteView, 'dapp_vote', '/dapp-vote')
+register_api(bp, UploadDAppView, 'dapp_upload', '/dapp-upload')
 bp.add_url_rule('/planet', view_func=SetupPlanetView.as_view('setup_planet'))
 bp.add_url_rule('/get-dust', view_func=GetDustView.as_view('get_dust'))
 bp.add_url_rule('/build', view_func=BuildPlanetView.as_view('build'))
