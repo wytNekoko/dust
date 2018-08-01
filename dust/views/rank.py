@@ -84,8 +84,8 @@ class NknContributorsView(MethodView):
                 t['github'] = 'https://github.com' + r.author_login
                 tmp.append(t)
                 continue
-            if tmp[-1].author_id == r.author_id:
-                tmp[-1].commit += r.commit
+            if tmp[-1]['author_id'] == r.author_id:
+                tmp[-1]['commit'] += r.commit
             else:
                 t = r.todict()
                 t['github'] = 'https://github.com' + r.author_login
