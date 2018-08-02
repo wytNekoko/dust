@@ -1,4 +1,4 @@
-from wtforms import StringField, Field, FileField
+from wtforms import StringField, Field, FileField, BooleanField
 from wtforms.validators import DataRequired, Length, URL
 from flask import request
 
@@ -161,6 +161,7 @@ class DAppForm(FForm):
     intro = StringField('intro', [DataRequired()])
     demo = StringField('demo', [URL()])
     logo_uri = StringField('logo_uri')
+    is_new = BooleanField('is_new')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -173,11 +174,11 @@ class DAppForm(FForm):
         item.git = self.git.data
         item.intro = self.intro.data
         item.demo = self.demo.data
-        if self.logo_uri.data:
-            item.logo = self.logo_uri.data
-        else:
+        if self.is_new.data:
             logo_url = get_file('logo')
             item.logo = logo_url
+        else:
+            item.logo = self.logo_uri.data
         db.session.add(item)
         db.session.commit()
         return item
