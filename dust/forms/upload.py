@@ -161,7 +161,7 @@ class DAppForm(FForm):
     intro = StringField('intro', [DataRequired()])
     demo = StringField('demo', [URL()])
     logo_uri = StringField('logo_uri')
-    is_new = BooleanField('is_new')
+    is_new = StringField('is_new')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -174,7 +174,7 @@ class DAppForm(FForm):
         item.git = self.git.data
         item.intro = self.intro.data
         item.demo = self.demo.data
-        if self.is_new.data:
+        if self.is_new.data == 'true':
             logo_url = get_file('logo')
             item.logo = logo_url
         else:
