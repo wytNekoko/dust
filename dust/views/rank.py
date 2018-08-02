@@ -88,7 +88,7 @@ class NknContributorsView(MethodView):
                 tmp[-1]['commit'] += r.commit
             else:
                 t = r.todict()
-                t['github'] = 'https://github.com' + r.author_login
+                t['github'] = 'https://github.com/' + r.author_login
                 tmp.append(t)
         tmp.sort(reverse=True, key=sort_dict_commit)
         return jsonify(tmp)

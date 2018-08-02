@@ -27,7 +27,7 @@ class LoginView(MethodView):
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             id=user.id,
-            # password=user.password,
+            password=user.password,
             created_at=datetime.now(),
         ))
         expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
