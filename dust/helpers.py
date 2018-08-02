@@ -13,7 +13,7 @@ from flask import Blueprint, Flask, jsonify
 
 
 def sort_dict_commit(item):
-    return item.commit
+    return item['commit']
 
 
 def register_blueprints(app, import_path, bp_name='bp'):
