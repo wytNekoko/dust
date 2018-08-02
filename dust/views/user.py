@@ -303,7 +303,7 @@ class UploadDAppView(MethodView):
         return d.todict()
 
     def post(self):
-        form = ProjectForm()
+        form = DAppForm()
         if form.validate():
             p = Project.query.filter_by(name=form.name.data).first()
             if p:
