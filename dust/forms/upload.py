@@ -160,7 +160,7 @@ class DAppForm(FForm):
     git = StringField('git', [DataRequired(), URL()])
     intro = StringField('intro', [DataRequired()])
     demo = StringField('demo', [URL()])
-    logo_uri = StringField('logo_uri', [URL()])
+    logo_uri = StringField('logo_uri')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
