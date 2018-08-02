@@ -167,6 +167,8 @@ class DAppForm(FForm):
 
     def set(self, pid):
         item = DApp.query.get(pid)
+        if not item:
+            raise NoData()
         item.name = self.name.data
         item.git = self.git.data
         item.intro = self.intro.data

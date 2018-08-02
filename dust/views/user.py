@@ -305,7 +305,7 @@ class UploadDAppView(MethodView):
     def post(self):
         form = DAppForm()
         if form.validate():
-            p = Project.query.filter_by(name=form.name.data).first()
+            p = DApp.query.filter_by(name=form.name.data).first()
             if p:
                 res = form.set(p.id)
             else:
