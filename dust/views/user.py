@@ -322,7 +322,8 @@ class UploadDAppView(MethodView):
         db.session.delete(d)
         current_user.owned_dust -= 100
         db.session.commit()
-        return
+        ret = [d.todict() for d in current_user.dapps]
+        return jsonify(ret)
 
 
 register_api(bp, FollowView, 'follow', '/follow')
