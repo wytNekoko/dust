@@ -141,6 +141,7 @@ class ProfileForm(FForm):
     email = StringField('email', [DataRequired()])
     gift = StringField('gift', [DataRequired(), Length(min=1)])
     eth = StringField('eth', [DataRequired(), Length(min=5)])
+    avatar_url = StringField('avatar_url')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -150,7 +151,8 @@ class ProfileForm(FForm):
             u = current_user
         else:
             raise LoginRequired()
-        u.avatar = get_file('file')
+        if u.avatar != self.avatar_url.data:
+            u.avatar = get_file('file')
         u.city = self.city.data
         u.email = self.email.data
         u.gift = self.gift.data
