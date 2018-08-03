@@ -1,4 +1,4 @@
-from wtforms import StringField, Field, FileField, BooleanField
+from wtforms import StringField, Field, IntegerField
 from wtforms.validators import DataRequired, Length, URL
 from flask import request
 
@@ -88,10 +88,13 @@ class AttenderForm(FForm):
 
 
 class ProjectForm(FForm):
+    id = IntegerField('id', [DataRequired()])
     name = Field('name', [DataRequired(), Length(max=50, min=1)])
     git = StringField('git', [DataRequired(), URL()])
     desc = StringField('desc', [DataRequired()])
     demo = StringField('demo', [URL()])
+    logo_uri = StringField('logo_uri')
+    is_new = StringField('is_new')
     # logo = StringField('logo', [DataRequired(), URL()])
     # photos = Field('demo_photos', default=[])
 
@@ -102,10 +105,12 @@ class ProjectForm(FForm):
         item = Project.query.get(pid)
         item.name = self.name.data
         item.git = self.git.data
-        logo_url = get_file('logo')
-        item.logo = logo_url
+        if self.is_new.data == 'true':
+            logo_url = get_file('logo')
+            item.logo = logo_url
+        else:
+            item.logo = self.logo_uri.data
         item.description = self.desc.data
-        logger.debug('project demo: %s', self.demo.data)
         if self.demo.data:
             item.demo = self.demo.data
             logger.debug('project demo: ', self.demo.data)
@@ -118,7 +123,6 @@ class ProjectForm(FForm):
         #         d = DemoPhoto(url=url, project_id=pid)
         #         db.session.add(d)
         #         item.photos.append(d)
-        db.session.add(item)
         db.session.commit()
         return item
 
@@ -156,6 +160,7 @@ class ProfileForm(FForm):
 
 
 class DAppForm(FForm):
+    id = IntegerField('id', [DataRequired()])
     name = Field('name', [DataRequired(), Length(max=50, min=1)])
     git = StringField('git', [DataRequired(), URL()])
     intro = StringField('intro', [DataRequired()])
@@ -179,7 +184,6 @@ class DAppForm(FForm):
             item.logo = logo_url
         else:
             item.logo = self.logo_uri.data
-        db.session.add(item)
         db.session.commit()
         return item
 

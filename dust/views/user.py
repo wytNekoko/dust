@@ -116,7 +116,7 @@ class UploadProject(MethodView):
     def post(self):
         form = ProjectForm()
         if form.validate():
-            p = Project.query.filter_by(name=form.name.data).first()
+            p = Project.query.get(form.id.data)
             if p:
                 res = form.set(p.id)
             else:
@@ -305,7 +305,7 @@ class UploadDAppView(MethodView):
     def post(self):
         form = DAppForm()
         if form.validate():
-            p = DApp.query.filter_by(name=form.name.data).first()
+            p = DApp.query.get(form.id.data)
             if p:
                 res = form.set(p.id)
             else:
@@ -318,6 +318,9 @@ class UploadDAppView(MethodView):
         d = DApp.query.get(item_id)
         if not d:
             raise NoData()
+        records = DAppVoteRecord.query.filter_by(to_did=d.id)
+        for r in records:
+            db.session.delete(r)
         current_user.dapps.remove(d)
         db.session.delete(d)
         current_user.owned_dust -= 100

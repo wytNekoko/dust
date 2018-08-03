@@ -68,10 +68,11 @@ class RankListView(MethodView):
 
 
 class ProjectView(MethodView):
-    def get(self):
-        ps = Project.query.all()
-        ret = [p.todict() for p in ps]
-        return jsonify(ret)
+    def get(self, tid):
+        p = Project.query.filter_by(team_id=tid)
+        if not p:
+            raise NoData()
+        return jsonify(p.todict())
 
 
 class DAppListView(MethodView):
@@ -100,5 +101,6 @@ bp.add_url_rule('/show', view_func=ShowcaseView.as_view('show_planets'))
 bp.add_url_rule('/one/<string:planet_name>', view_func=GetOnePlanetView.as_view('one_planet'))
 bp.add_url_rule('/all', view_func=AllPlanetsView.as_view('all_planets'))
 bp.add_url_rule('/ranklist', view_func=RankListView.as_view('rank_list'))
+bp.add_url_rule('/project/<int:tid>', view_func=ProjectView.as_view('project_of_team'))
 bp.add_url_rule('/dapp/list/<int:uid>', view_func=DAppListView.as_view('dapp_list'))
 bp.add_url_rule('/dapp/<int:uid>', view_func=DAppView.as_view('dapp'))
