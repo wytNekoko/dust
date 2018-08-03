@@ -69,7 +69,7 @@ class RankListView(MethodView):
 
 class ProjectView(MethodView):
     def get(self, tid):
-        p = Project.query.filter_by(team_id=tid)
+        p = Project.query.filter_by(team_id=tid).first()
         if not p:
             raise NoData()
         return jsonify(p.todict())
