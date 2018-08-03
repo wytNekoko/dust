@@ -319,7 +319,7 @@ class UploadDAppView(MethodView):
         if not d:
             raise NoData()
         current_user.dapps.remove(d)
-        db.session.remove(d)
+        db.session.delete(d)
         current_user.owned_dust -= 100
         db.session.commit()
         return
