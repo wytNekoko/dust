@@ -329,6 +329,14 @@ class UploadDAppView(MethodView):
         return jsonify(ret)
 
 
+class ClaimIdentityView(MethodView):
+    def post(self):
+        data = request.get_json()
+        current_user.owned_dust += data.get('delta')
+        db.session.commit()
+        return jsonify(current_user.todict())
+
+
 register_api(bp, FollowView, 'follow', '/follow')
 register_api(bp, LikeActivity, 'like', '/like')
 register_api(bp, DAppVoteView, 'dapp_vote', '/dapp-vote')
@@ -346,4 +354,4 @@ bp.add_url_rule('/team-manage', view_func=TeamView.as_view('team_manage'))
 bp.add_url_rule('/team-add-member', view_func=AddMember.as_view('team_add_member'))
 bp.add_url_rule('/team-leave', view_func=LeaveTeam.as_view('team_leave'))
 bp.add_url_rule('/team-vote', view_func=TeamVoteView.as_view('team_vote'))
-
+bp.add_url_rule('/claim-identity', view_func=ClaimIdentityView.as_view('claim_identity'))

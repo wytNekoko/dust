@@ -18,7 +18,7 @@ def get_builders_num():
 
 
 def github_plan():
-    app = create_app()
+    app = create_app('dust.config.TestConfig')
     with app.app_context():
         get_rank()
         github_score()
