@@ -76,7 +76,7 @@ class GithubContribute(MethodView):
         for index, g in enumerate(gs.items):
             info = g.todict()
             commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).order_by(ContributeRecord.commit.desc()).limit(2)
-            info['rank'] = (page-1)*10 + index
+            info['rank'] = (page-1)*10 + index + 1
             info['commit'] = [cc.todict() for cc in commit_info]
             res['items'].append(info)
         return jsonify(res)

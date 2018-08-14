@@ -47,6 +47,7 @@ exceptions = [
     ('TooManyVotes', 1016, '您的队伍已经投给该队伍两张票，不能再投了.'),
     ('VoteSelfError', 1017, '投给自己是不对的'),
     ('VoteDAppError', 1018, '您只能投给一个DApp'),
+    ('EmailRequired', 1019, '需要填email'),
     ('SystemRoleCanNotEdit', 1101, 'System role cannot be edited.'),
     ('SystemRoleCanNotDelete', 1102, 'System role cannot be deleted.'),
     ('APITokenError', 9001, 'API Token Error.'),

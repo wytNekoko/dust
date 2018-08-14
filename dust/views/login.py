@@ -6,7 +6,7 @@ from flask.views import MethodView
 from flask_mail import Message
 
 from ..core import redis_store,  db, oauth_client, mail
-from ..exceptions import LoginInfoError, LoginInfoRequired, NoError, LoginAuthError, RegisterFailError, ResetTokenError
+from ..exceptions import LoginInfoRequired, LoginInfoError, NoError, LoginAuthError, EmailRequired, ResetTokenError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -19,11 +19,11 @@ class LoginView(MethodView):
         username = data.get('username')
         password = data.get('password')
         if not (username and password):
-            raise LoginInfoRequired
+            raise LoginInfoRequired()
 
         user = User.get_by_username(username)
         if not (user and user.check_password(password)):
-            raise LoginInfoError
+            raise LoginInfoError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             id=user.id,
@@ -49,7 +49,7 @@ class LogoutView(MethodView):
         auth_token = request.headers.get('X-Auth-Token')
         if auth_token:
             redis_store.delete(auth_token)
-        raise NoError
+        raise NoError()
 
 
 class LoginAuthGithub(MethodView):
@@ -97,12 +97,12 @@ class LoginAuthGithub(MethodView):
         return dict(auth_token=auth_token, expires_in=expires_in, user_info=u.todict())
 
 
-class ResetPassword(MethodView):
+class SendEmailResetPassword(MethodView):
     def post(self):
         data = request.get_json() or {}
         email = data.get('email')
         if not email:
-            raise LoginInfoRequired()
+            raise EmailRequired()
         user = User.get_by_email(email)
         if not user:
             raise LoginInfoError()
@@ -116,23 +116,23 @@ class ResetPassword(MethodView):
         msg = Message(subject='密码重置',  # 需要使用默认发送者则不用填
                       recipients=[email])
         # 邮件内容会以文本和html两种格式呈现，而你能看到哪种格式取决于你的邮件客户端。
-        msg.html = "<b>请点击一下链接修改密码：<a href='http://ranking.dorahacks.com/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
+        msg.html = "<b>请点击链接修改密码：<a href='http://localhost:8080/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
         mail.send(msg)
         return dict(state=0)
 
 
-class ResetPassword2(MethodView):
+class ResetPassword(MethodView):
     def post(self):
         data = request.get_json() or {}
         token = data.get('token')
         passwd = data.get('passwd')
         if not (token and passwd):
-            raise LoginInfoRequired
+            raise LoginInfoRequired()
         if not redis_store.exists(token):
-            raise ResetTokenError
+            raise ResetTokenError()
         token_info = redis_store.hget(token, 'email')
         user = User.get_by_email(token_info)
-        user.password=passwd
+        user.password = passwd
         db.session.commit()
          # auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         return dict(state=0)
@@ -141,5 +141,5 @@ class ResetPassword2(MethodView):
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
 bp.add_url_rule('/auth-login/github', view_func=LoginAuthGithub.as_view('login_github'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
-bp.add_url_rule('/resetpassword', view_func=ResetPassword.as_view('resetpassword'))
-bp.add_url_rule('/resetPassword2', view_func=ResetPassword2.as_view('resetPassword2'))
+bp.add_url_rule('/send-email', view_func=SendEmailResetPassword.as_view('send_email_resetpassword'))
+bp.add_url_rule('/resetpassword', view_func=ResetPassword.as_view('resetPassword'))
