@@ -55,7 +55,8 @@ class Hacker(MethodView):
         if not c:
             raise NoData()
         ret = c.todict()
-        records = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(ContributeRecord.commit.desc()).limit(10)
+        records = ContributeRecord.query.filter_by(author_login=c.author_login).order_by(
+            ContributeRecord.commit.desc()).limit(10)
         ret['commit_info'] = [r.todict() for r in records]
         return jsonify(ret)
 
@@ -66,6 +67,7 @@ class GithubContribute(MethodView):
         page = req_data.get('page')
         per_page = req_data.get('per_page')
         gs = Contributor.query.order_by(Contributor.score.desc()).paginate(page, per_page=per_page, error_out=False)
+
         res = {
             'items': [],
             'page': page if page else 1,
@@ -75,8 +77,38 @@ class GithubContribute(MethodView):
         }
         for index, g in enumerate(gs.items):
             info = g.todict()
-            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).order_by(ContributeRecord.commit.desc()).limit(2)
-            info['rank'] = (page-1)*10 + index + 1
+            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login).order_by(
+                ContributeRecord.commit.desc()).limit(2)
+            info['rank'] = (page - 1) * 10 + index + 1
+            info['commit'] = [cc.todict() for cc in commit_info]
+            res['items'].append(info)
+        return jsonify(res)
+
+
+class SearchContributorByChainName(MethodView):
+    def post(self):
+        req_data = request.get_json()
+        page = req_data.get('page')
+        per_page = req_data.get('per_page')
+        chain_name = req_data.get('chain_name')
+        gss = db.session.query(ContributeRecord.author_login).filter_by(chain_name=chain_name).distinct(
+            ContributeRecord.author_login).paginate(page, per_page=per_page, error_out=False)
+        aa = [cc.author_login for cc in gss.items]
+        gs = Contributor.query.filter(Contributor.author_login.in_(aa)).order_by(Contributor.score.desc()).paginate(
+            page, per_page=per_page, error_out=False)
+        res = {
+            'items': [],
+            'page': page if page else 1,
+            'pages': 1 if gs.total / per_page <= 1 else int(gs.total / per_page) + 1,
+            'total': gs.total,
+            'per_page': per_page
+        }
+
+        for index, g in enumerate(gs.items):
+            info = g.todict()
+            commit_info = ContributeRecord.query.filter_by(author_login=g.author_login, chain_name=chain_name).order_by(
+                ContributeRecord.commit.desc()).limit(2)
+            info['rank'] = (page - 1) * 10 + index + 1
             info['commit'] = [cc.todict() for cc in commit_info]
             res['items'].append(info)
         return jsonify(res)
@@ -86,3 +118,5 @@ bp.add_url_rule('/someone', view_func=Hacker.as_view('one_hacker'))
 bp.add_url_rule('/owned-planets/<string:username>', view_func=OwnedPlanets.as_view('owned_planets'))
 bp.add_url_rule('/builded-planets/<string:username>', view_func=BuildedPlanets.as_view('builded_planets'))
 bp.add_url_rule('/github-contribute', view_func=GithubContribute.as_view('github_contribute'))
+bp.add_url_rule('/github-contribute-by-chain',
+                view_func=SearchContributorByChainName.as_view('github_contribute_by_chain'))
