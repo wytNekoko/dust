@@ -29,19 +29,18 @@ app.config.from_object(config)
 Migrate(app, db)
 
 
-
 def background_thread(message):
-#     """Example of how to send server generated events to clients."""
-#     while True:
-#         socketio.sleep(5) # 每五秒发送一次
-        socketio.emit('get_msg',message, namespace='/websocket/user_refresh')
+    #     """Example of how to send server generated events to clients."""
+    #     while True:
+    #         socketio.sleep(5) # 每五秒发送一次
+    socketio.emit('get_msg', message, namespace='/websocket/user_refresh')
 
 
 # 新加入的内容-开始
 @socketio.on('connect', namespace='/websocket/user_refresh')
 def connect():
     """ 服务端自动发送通信请求 """
-    print('=='*10,'已连接')
+    print('==' * 10, '已连接')
 
 
 @socketio.on('connect_event', namespace='/websocket/user_refresh')
@@ -56,7 +55,6 @@ def connect_event(message):
     msl = db.session.query(MsgList).filter(MsgList.to_id == user_id).order_by(MsgList.created_at.desc())
     members = [dict(demjson.decode(m.msg)) for m in msl]
 
-
     # msl1 = db.session.query(MsgList).filter( MsgList.to_id == user_id, MsgList.istalk ==None ).order_by(MsgList.created_at.desc())
     # members1 = [dict(demjson.decode(m.msg)) for m in msl1]
     # members = members + members1
@@ -68,13 +66,12 @@ def connect_event(message):
     # result['msl2'] = members2
 
     socketio.emit('init_msg', data=members, room=sid, namespace='/websocket/user_refresh')
-    print('**'*10,conns)
+    print('**' * 10, conns)
 
 
 @socketio.on('send_message', namespace='/websocket/user_refresh')
 def send_message(message):
-
-    print('send_message',message)
+    print('send_message', message)
     user_id = message['from_id']
     if user_id == None:
         return
@@ -89,8 +86,8 @@ def send_message(message):
     message['apply'] = 0
     message['id'] = user_id
     if isgroup == 1:
-        print('&&'*10,'群组消息')
-        us = User.query.filter_by(cteam_id =user.cteam_id)
+        print('&&' * 10, '群组消息')
+        us = User.query.filter_by(cteam_id=user.cteam_id)
         message['name'] = "TeamName"
         message['id'] = 'group_' + str(user.cteam_id)
         message['from_id'] = 'group_' + str(user.cteam_id)
@@ -108,9 +105,8 @@ def send_message(message):
         if to_id in conns.keys():
             to_sid = conns[to_id]
             socketio.emit('get_msg', data=message, room=to_sid, namespace='/websocket/user_refresh')
-            print('======='*10)
-        print('**id**'*10,message)
-
+            print('=======' * 10)
+        print('**id**' * 10, message)
 
     # msgLIst = MsgList()
     # msgLIst.from_id=message['from_id']
@@ -123,7 +119,6 @@ def send_message(message):
 
 @socketio.on('talk_sync', namespace='/websocket/user_refresh')
 def send_message(message):
-
     msgLIst = MsgList()
     msgLIst.from_id = message['userid']
     msgLIst.msg = demjson.encode(message['result'])
@@ -139,7 +134,7 @@ def send_message(message):
     from_id = message['from_id']
     to_id = message['to_id']
     us = User.query.get(to_id)
-    u = dict(avatar=us.avatar, name=us.hacker_name, intro=us.slogan, uid=us.id,cteam_id=us.cteam_id)
+    u = dict(avatar=us.avatar, name=us.hacker_name, intro=us.slogan, uid=us.id, cteam_id=us.cteam_id)
 
     # {url: 'images/6.png', name: '4', id: 4, txt: `I’m glad to join your team  `, time: '2016/06/16', readstate: 0, isgroup: 0, apply: 1}
     result = {}
@@ -152,7 +147,7 @@ def send_message(message):
     result['apply'] = 1
     result['isinvitation'] = message['isinvitation']
 
-    if message['isinvitation'] ==1:
+    if message['isinvitation'] == 1:
         result['txt'] = '邀请您加入:  ' + message['msg']
     else:
         result['txt'] = '我想加入团队:  ' + message['msg']
@@ -173,23 +168,19 @@ def send_message(message):
         socketio.emit('get_join', data=result, room=to_sid, namespace='/websocket/user_refresh')
         socketio.emit('get_msg', data=result1, room=from_sid, namespace='/websocket/user_refresh')
 
-
-    print(message,result)
-    #保存确认
+    print(message, result)
+    # 保存确认
     msgLIst = MsgList()
 
     msgLIst.from_id = from_id
     msgLIst.to_id = to_id
     msgLIst.msg = demjson.encode(result)
 
-
-
-    #保存返回说明
+    # 保存返回说明
     msgLIst1 = MsgList()
     msgLIst1.from_id = to_id
     msgLIst1.to_id = from_id
     msgLIst1.msg = demjson.encode(result1)
-
 
     db.session.add(msgLIst)
     db.session.add(msgLIst1)
@@ -215,7 +206,7 @@ def send_message(message):
     result['time'] = time.strftime("%Y/%m/%d %H", time.localtime())
     result['isgroup'] = 0
 
-    if message['isNO'] ==1:
+    if message['isNO'] == 1:
         result['from_id'] = to_id
         result['id'] = to_id
         result['msg'] = '已拒绝'
@@ -233,7 +224,6 @@ def send_message(message):
 
         # 现在是否以加入团队
         if fus.cteam_id != 0:
-
             result['from_id'] = to_id
             result['id'] = to_id
             result['msg'] = '已有团队，不能添加'
@@ -252,7 +242,6 @@ def send_message(message):
         fus_count = fus_t.with_entities(func.count(User.id)).scalar()
         # 邀请方团队是否超过最大数量
         if fus_count > 6:
-
             result['from_id'] = to_id
             result['id'] = to_id
             result['msg'] = '团队达到最大数量'
@@ -310,7 +299,6 @@ def send_message(message):
         fus_count = fus_t.with_entities(func.count(User.id)).scalar()
         # 邀请方团队是否超过最大数量
         if fus_count > 6:
-
             result['from_id'] = to_id
             result['id'] = to_id
             result['msg'] = '团队达到最大数量'
@@ -374,7 +362,7 @@ def exit_group(message):
     print(message)
     from_id = message['from_id']
     user = User.query.get(from_id)
-    us = User.query.filter_by(cteam_id =user.cteam_id)
+    us = User.query.filter_by(cteam_id=user.cteam_id)
 
     result = {}
     result['avatar'] = user.avatar
@@ -384,11 +372,11 @@ def exit_group(message):
 
     if user.cteam_id != 0:
 
-        if user.is_admin ==0:
-            user.cteam_id=0
+        if user.is_admin == 0:
+            user.cteam_id = 0
         else:
             for u in us:
-                u.cteam_id=0
+                u.cteam_id = 0
 
         db.session.commit()
         for u in us:
@@ -415,4 +403,4 @@ def exit_group(message):
 
 
 if __name__ == '__main__':
-    socketio.run(app,port=7050, debug=True,host='127.0.0.1')
+    socketio.run(app, port=7050, debug=True, host='127.0.0.1')

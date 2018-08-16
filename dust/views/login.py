@@ -5,8 +5,9 @@ from flask import Blueprint, current_app, request
 from flask.views import MethodView
 from flask_mail import Message
 
-from ..core import redis_store,  db, oauth_client, mail
-from ..exceptions import LoginInfoRequired, LoginInfoError, NoError, LoginAuthError, EmailRequired, ResetTokenError
+from ..core import redis_store, db, oauth_client, mail
+from ..exceptions import LoginInfoRequired, LoginInfoError, NoError, LoginAuthError, EmailRequired, ResetTokenError, \
+    NoEmailError
 from ..models.user_planet import User, Notification
 from ..constants import Notify, NotifyContent
 
@@ -30,7 +31,7 @@ class LoginView(MethodView):
             # password=user.password,
             created_at=datetime.now(),
         ))
-        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
+        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200 * 12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
 
         # s = redis_store.get("%s:build_times" % user.id)
@@ -83,7 +84,7 @@ class LoginAuthGithub(MethodView):
             created_at=datetime.now(),
         ))
         db.session.commit()
-        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200*12)  # expire in 1 day
+        expires_in = current_app.config.get('LOGIN_EXPIRE_TIME', 7200 * 12)  # expire in 1 day
         redis_store.expire(auth_token, expires_in)
 
         # s = redis_store.get("%s:build_times" % user.id)
@@ -105,7 +106,7 @@ class SendEmailResetPassword(MethodView):
             raise EmailRequired()
         user = User.get_by_email(email)
         if not user:
-            raise LoginInfoError()
+            raise NoEmailError()
         auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         redis_store.hmset(auth_token, dict(
             email=email,
@@ -116,7 +117,8 @@ class SendEmailResetPassword(MethodView):
         msg = Message(subject='密码重置',  # 需要使用默认发送者则不用填
                       recipients=[email])
         # 邮件内容会以文本和html两种格式呈现，而你能看到哪种格式取决于你的邮件客户端。
-        msg.html = "<b>请点击链接修改密码：<a href='http://localhost:8080/#/resetpassword?token=%s'>修改密码</a><b>" % auth_token
+        cnt = "<b>请点击链接修改密码：<a href='http://ranking.dorahacks.com/#/resetpassword?token=%s'>修改密码</a><br>如果打不开可以复制链接到浏览器打开<b>"
+        msg.html = cnt % auth_token
         mail.send(msg)
         return dict(state=0)
 
@@ -134,12 +136,12 @@ class ResetPassword(MethodView):
         user = User.get_by_email(token_info)
         user.password = passwd
         db.session.commit()
-         # auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
+        # auth_token = binascii.hexlify(os.urandom(16)).decode()  # noqa
         return dict(state=0)
 
 
 bp.add_url_rule('/login', view_func=LoginView.as_view('login'))
 bp.add_url_rule('/auth-login/github', view_func=LoginAuthGithub.as_view('login_github'))
 bp.add_url_rule('/logout', view_func=LogoutView.as_view('logout'))
-bp.add_url_rule('/send-email', view_func=SendEmailResetPassword.as_view('send_email_resetpassword'))
-bp.add_url_rule('/resetpassword', view_func=ResetPassword.as_view('resetPassword'))
+bp.add_url_rule('/send-email', view_func=SendEmailResetPassword.as_view('send_email_reset_password'))
+bp.add_url_rule('/reset-password', view_func=ResetPassword.as_view('reset_password'))
